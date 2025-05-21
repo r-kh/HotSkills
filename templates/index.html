@@ -1,0 +1,128 @@
+<!-- Наследование base.html и его расширение -->
+{% extends "base.html" %}
+
+<!-- название вкладки (переопределение) -->
+{% block title %}Тех.навыки / Рынок / HH.RU{% endblock %}
+
+<!-- Начало блока контента -->
+{% block content %}
+
+<!-- прелоад иконок — РАНЬШЕ всего -->
+<script>
+    (async function preloadIcons() {
+        try {
+            const res = await fetch("/api/languages");
+            const languages = await res.json();
+
+            languages.forEach(({code}) => {
+                const link = document.createElement("link");
+                link.rel = "preload";
+                link.as = "image";
+                link.href = `/static/logos/${code}.webp`;
+                document.head.appendChild(link);
+            });
+        } catch (e) {
+            console.error("Ошибка при прелоаде иконок:", e);
+        }
+    })();
+</script>
+
+
+<!-- Информирование о статистике с HH.RU на текущую дату/время -->
+<div class="data-info">
+    <p>HH.RU: статистика на <span id="current-datetime"></span></p>
+</div>
+
+
+<!-- Заголовок графика 1 -->
+<div class="chart-title">
+    Разработчики ПО (спрос на разработчиков в данный момент)
+</div>
+
+
+<!-- Первый график: Разработчики ПО -->
+<div class="chart-container">
+    <div id="chart_software_developer" class="chart"></div>
+</div>
+
+
+<!-- Центровой страничный контейнер ограничивающий ширину (чтобы содержимое при ультра широких экранах не съехало в бок) -->
+<div class="container-page">
+
+    <!-- Пруфлинк -->
+    <p class="chart-source">
+        Данные собираются с сайта HH.RU по специализации "Программист, разработчик". (<a href="https://hh.ru/search/vacancy?professional_role=96" target="_blank">Ссылка для проверки.</a>)
+    </p>
+</div>
+
+
+<!-- Блок зарплат -->
+
+<!-- Заголовок для таблицы с зарплатами по языкам программирования. Если удалить, не будет отображаться заголовок. -->
+<div class="chart-title" style="margin-top: 40px;">
+    Зарплатные вилки по языкам программирования (на основе текущих открытых вакансий с прописанным окладом и после налогов)
+</div>
+
+
+<!-- Контейнер и таблица для отображения зарплатных вилок для разных языков программирования. -->
+<div class="salary-table-wrapper">
+
+    <div class="tabs">
+        <div class="tab active" data-value="moscow">Москва</div>
+        <div class="tab" data-value="russia">Россия</div>
+    </div>
+
+    <table class="salary-table">
+        <thead>
+        <tr>
+            <th data-sortable>Язык</th>
+            <th data-sortable>Вакансий</th>
+            <th data-sortable>Без опыта</th>
+            <th data-sortable>1–3 года</th>
+            <th data-sortable>3–6 лет</th>
+            <th data-sortable>6+ лет</th>
+        </tr>
+        </thead>
+        <tbody>
+            <!-- Здесь контент отрабатывает scripts.js (логотипы, названия языков, вакансии, зарплаты) -->
+        </tbody>
+    </table>
+</div>
+
+
+<!-- Центровой страничный контейнер ограничивающий ширину (чтобы содержимое при ультра широких экранах не съехало в бок) -->
+<div class="container-page">
+
+    <!-- Пруфлинк -->
+    <p class="chart-source">
+        Зарплатные вилки по языкам высчитываются с собранных вакансий HH.RU где указан доход. Налоги учитываются (разные ставки 13-15% тоже). Данные округляются до сотен и обновляются 1 раз в день.<br>
+        (Зарплатная вилка — среднее значение из всех минимальных зарплат и среднее значение из всех максимальных зарплат по найденным вакансиям)
+    </p>
+</div>
+
+
+
+
+
+<!-- Заголовок графика 2 -->
+<div class="chart-title">
+    Языки программирования (динамика популярности в открытых вакансиях по разработке в данный момент)
+</div>
+
+
+<!-- Контейнер для второго графика с языками программирования. -->
+<div class="chart-container">
+    <div id="chart_all_languages" class="chart"></div>
+</div>
+
+
+
+<!-- Подключение библиотеки Plotly для отображения графиков. Если удалить, графики не будут отображаться, так как эта библиотека не будет загружена. -->
+<script defer src="https://cdn.plot.ly/plotly-basic-latest.min.js"></script>
+
+<!-- Подключение JavaScript-файла (интерактивные элементы, графики, анимации и т.д.) -->
+<script src="/static/scripts.js" defer></script>
+
+
+{% endblock %}
+<!-- Закрытие блока контента. -->

@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}{{ language_name }} / Статистика / HotSkills.info{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{{ language_name }}</h1>
+    <p>Это страница статистики для языка: <strong>{{ language_name }}</strong></p>
+    <p>Здесь будет отображаться статистика и список востребованных навыков.</p>
+    <p>Текущее время на сервере: <span id="current-datetime"></span></p>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const now = new Date();
+        document.getElementById('current-datetime').textContent = now.toLocaleString();
+    });
+</script>
+{% endblock %}

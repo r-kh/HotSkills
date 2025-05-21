@@ -1,0 +1,97 @@
+<!DOCTYPE html> <!--Информация для браузера>-->
+
+<!--Открытие документа-->
+<html lang="ru"> <!--"ru" язык страницы русский (для SEO)-->
+
+
+<!-- Мета информация (не отображается на самой странице) -->
+<head>
+    <!--поддержка русского языка-->
+    <meta charset="UTF-8">
+
+    <!-- Поддержка адаптивности для мобильных устройствах -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+    <!-- Иконка сайта (favicon) во вкладке, закладках и рядом с названием -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico?v=6">
+<!--    <link rel="icon" type="image/png" href="/favicon.png">-->
+
+    <!-- шрифт логотипа -->
+<!--    <link rel="preload" href="/static/fonts/Orbitron-SemiBold.ttf" as="font" type="font/ttf" crossorigin="anonymous">-->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
+
+    <!-- шрифт сайта по умолчанию (с несколькими весами) -->
+<!--    <link rel="preload" href="/static/fonts/Exo2-Regular.ttf" as="font" type="font/ttf" crossorigin="anonymous">-->
+<!--    <link rel="preload" href="/static/fonts/Exo2-SemiBold.ttf" as="font" type="font/ttf" crossorigin="anonymous">-->
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Подключение основного CSS-файла со стилями -->
+    <link rel="stylesheet" href="/static/styles.css">
+
+    <!-- Отображать тело сайта только после загрузки шрифтов -->
+    <script>
+        document.fonts.ready.then(() => {
+            document.body.style.visibility = 'visible';
+        });
+    </script>
+
+    <!-- Текст вкладки браузера (иначе вкладка будет называться просто как URL, плохо для навигации и SEO) -->
+    <title>{% block title %}HotSkills.info{% endblock %}</title>
+
+</head>
+
+
+<!-- Тело страницы (всё, что будет отображаться в браузере) -->
+<body>
+
+
+<!-- Хедер страницы -->
+<header class="site-header">
+
+    <!-- Центровой страничный контейнер ограничивающий ширину (чтобы содержимое при ультра широких экранах не съехало в бок) -->
+    <div class="container-page">
+
+        <!-- Ссылка, ведущая на главную страницу. Без подчёркивания, цвет по умолчанию от родителя (не синий) -->
+        <a href="/" style="text-decoration: none; color: inherit;">
+
+            <!-- Обёртка иконки и названия сайта -->
+            <div class="container-icon-text">
+
+                <!-- Логотип у основного названия -->
+                <img src="/static/logos/HotSkills.info.webp" alt="HotSkills Logo" class="site-logo">
+
+                <!-- Основное название сайта -->
+                <div class="site-title">
+                    HotSkills.info
+
+                    <!-- Слоган под названием -->
+                    <div class="site-slogan">[спрос на разработчиков и навыки]</div>
+
+                </div>
+            </div>
+        </a>
+    </div>
+</header>
+
+
+<!-- Основной контент страницы -->
+<main>
+    <!-- шаблонный синтаксис Jinja2, который используется в FastAPI (через Jinja2Templates) -->
+    {% block content %}{% endblock %}
+</main>
+
+
+<!-- Нижняя часть сайта -->
+<footer class="footer">
+
+    <p><span class="nowrap">Навыки в разработке нужные рынку — в цифрах и графиках.</span></p>
+    <p><span class="nowrap">Каждый час. Каждый день. На основании данных с <span class="hh-ru-text">HH.RU</span>.</span>
+    </p>
+
+</footer>
+
+
+</body>
+
+
+</html>
