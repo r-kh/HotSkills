@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // === Сбор данных для графиков через API запрос к Redis/PostgreSQL === //
     async function fetchChartStatistics() {
-        const res = await fetch('/api/vacancy-data');
+        const res = await fetch('/api/vacancy-statistics');
         if (!res.ok) throw new Error(`API: ${res.status} - ${await res.text()}`);
         return res.json();
     }
@@ -327,7 +327,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!cachedSalariesData || !cachedVacancyData) {
                 const [salariesRes, vacancyRes] = await Promise.all([
                     fetch("/api/salaries"),
-                    fetch("/api/vacancy-data")
+                    fetch("/api/vacancy-statistics")
                 ]);
 
                 [cachedSalariesData, cachedVacancyData] = await Promise.all([
