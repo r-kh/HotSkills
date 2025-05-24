@@ -6,10 +6,11 @@ import redis.asyncio as redis                               # Кэширован
 import uvicorn                                              # ASGI сервер (Asynchronous Server Gateway Interface)
 
 from contextlib import asynccontextmanager                  # для запуска/завершения FastAPI
-from fastapi import FastAPI                                 # FastAPI
+from fastapi import FastAPI, Request                        # FastAPI и Request для Jinja
 from fastapi.responses import HTMLResponse, JSONResponse    # Ответы сервера
 from fastapi.staticfiles import StaticFiles                 # Подключение /static папки
 from fastapi.templating import Jinja2Templates              # Рендер HTML-шаблонов с динамическими данными (для lang.html)
+from jinja2 import Environment, FileSystemLoader            # Шаблонизатор Jinja2 (HTML)
 
 
 # --- Конфигурация базы данных (берётся из переменных окружения) ---
@@ -62,20 +63,20 @@ app = FastAPI(lifespan=lifespan)
 
 # --- Подключаем статические файлы (/static) и шаблоны (HTML) в FastAPI-приложение ---
 app.mount("/static", StaticFiles(directory=os.getenv("STATIC_DIR")), name="static") # подключение CSS, JS, изображений
-templates = Jinja2Templates(directory=os.getenv("TEMPLATES_DIR")) # шаблоны HTML (через Jinja2) (надо попробовать переехать на React/Vue)
+templates = Jinja2Templates(env=Environment(loader=FileSystemLoader(os.getenv("TEMPLATES_DIR")))) # шаблоны HTML (через Jinja2) (надо попробовать переехать на React/Vue)
 
 
 # --- Главная страница сайта (index.html) ---
 @app.get("/", response_class=HTMLResponse)
 # Ловим GET запрос по адресу "/" и отвечаем HTML'ом
-async def index():
-    return templates.TemplateResponse("index.html", {})
+async def index(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
 # --- Обработчик GET-запроса для страницы языка по коду (lang.html) ---
 @app.get("/{lang}", response_class=HTMLResponse)
 # ловим URL с переменной lang (код языка), передаём её в асинхронную функцию-обработчик и возвращаем HTML
-async def show_lang_page(lang: str):
+async def show_lang_page(request: Request, lang: str):
 
     async with app.state.db_pool.acquire() as conn:    # Получаем соединение из пула БД (иначе запрос не отправить)
         # ищем язык (name, code) по коду (lang)
@@ -90,8 +91,9 @@ async def show_lang_page(lang: str):
 
     # Возвращаем отрендереный шаблон lang.html (с code и name)
     return templates.TemplateResponse("lang.html", {
-        "code" : row["code"],  # для логотипов/таблиц/графиков
-        "name" : row["name"]   # для правильного отображения языка на страницах
+        "request": request,
+        "code"   : row["code"],  # для логотипов/таблиц/графиков
+        "name"   : row["name"],  # для правильного отображения языка на страницах
     })
 
 
