@@ -1,45 +1,45 @@
-/*!* Orbitron 600 *!*/
-/*@font-face {*/
-/*    font-family: 'Orbitron';*/
-/*    src: url('/static/fonts/Orbitron-SemiBold.ttf') format('truetype');*/
-/*    font-weight: 600;*/
-/*    font-style: normal;*/
-/*    font-display: swap;*/
-/*}*/
+/* Orbitron 600 */
+@font-face {
+    font-family: 'Orbitron';
+    src: url('/static/fonts/Orbitron-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
 
-/*!* Exo 2 400 *!*/
-/*@font-face {*/
-/*    font-family: 'Exo 2';*/
-/*    src: url('/static/fonts/Exo2-Regular.ttf') format('truetype');*/
-/*    font-weight: 400;*/
-/*    font-style: normal;*/
-/*    font-display: swap;*/
-/*}*/
+/* Exo 2 400 */
+@font-face {
+    font-family: 'Exo 2';
+    src: url('/static/fonts/Exo2-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
 
-/*!* Exo 2 500 *!*/
-/*@font-face {*/
-/*    font-family: 'Exo 2';*/
-/*    src: url('/static/fonts/Exo2-Medium.ttf') format('truetype');*/
-/*    font-weight: 500;*/
-/*    font-style: normal;*/
-/*    font-display: swap;*/
-/*}*/
+/* Exo 2 500 */
+@font-face {
+    font-family: 'Exo 2';
+    src: url('/static/fonts/Exo2-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
 
-/*!* Exo 2 600 *!*/
-/*@font-face {*/
-/*    font-family: 'Exo 2';*/
-/*    src: url('/static/fonts/Exo2-SemiBold.ttf') format('truetype');*/
-/*    font-weight: 600;*/
-/*    font-style: normal;*/
-/*    font-display: swap;*/
-/*}*/
+/* Exo 2 600 */
+@font-face {
+    font-family: 'Exo 2';
+    src: url('/static/fonts/Exo2-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
 
 
 /* Обнуляем html и body, чтобы сделать стартовую точку максимально "чистой" и одинаковой во всех браузерах. */
 html, body {
     margin      : 0;                    /* это отступы между блоками на странице, 0 = убираем не наши отступы, чтобы дальше задать свои. */
     padding     : 0;                    /* отступ внутри блоков (между краем блока и его содержимым) */
-    font-family : 'Exo 2';/*, sans-serif;  /* Задаем шрифт Exo 2, если он загружен. Если нет — резервный шрифт sans-serif */
+    font-family : 'Exo 2';              /* Задаем шрифт Exo 2, если он загружен. Если нет — резервный шрифт sans-serif */
     font-weight : 400;                  /* жирность шрифта = 400 (или normal, это дефолтное состояние, можно не указывать явно, можно указывать) */
     font-size   : 16px;                 /* или 1rem - это дефолтное значение в 16 пикселей, можно переопределить при необходимости, rem — это "root em", единица, основанная на размере шрифта корневого тега (html) */
     text-align  : center;               /* выравнивание текста по центру внутри его контейнера по горизонтали. */
@@ -130,30 +130,38 @@ body {
 /* ===== ГРАФИК ===== */
 /* Заголовок графика */
 .chart-title {
-    /*font-size       : 16px;     !* размер шрифта *!*/
+    /*font-size       : 14px;     !* размер шрифта *!*/
     font-weight     : 600;      /* жирность шрифта - 400 - обычный, 600 - полужирный, 900 - очень жирный */
-    margin-top      : 24px;     /* это отступ сверху */
-    margin-bottom   : 6px;      /* это отступ снизу */
+    margin-top      : 8px;     /* это отступ сверху */
+    margin-bottom   : 8px;      /* это отступ снизу */
+}
+
+/* (Заголовок графика) Информация в скобках */
+.title-sub {
+    font-weight: 400;
+    color           : #808080;
+    font-size       : 15px;
+    /*display: block;*/
+    /*margin-top: 4px; !* по желанию *!*/
 }
 
 /* Контейнер графика */
 .chart-container {
+    margin          : auto;   /* 0 - внешние отступы сверху и снизу; auto - слева и справа*/
+    padding         : 10px;
+    max-width       : 1400px;
     display         : flex;     /* Включает флексбокс, чтобы элементы внутри (img, div, текст и т.д.) шли в одну строку по горизонтали (по умолчанию flex-direction: row). */
     justify-content : center;   /* Горизонтальное выравнивание: всё содержимое будет по центру контейнера. */
     align-items     : center;   /* Вертикальное выравнивание: элементы по центру высоты контейнера (если есть высота). */
-    margin-top      : -6px;     /* Поднимает контейнер чуть выше (удаляет "пустое" пространство сверху). */
+    /*margin-top      : -6px;     !* Поднимает контейнер чуть выше (удаляет "пустое" пространство сверху). *!*/
 }
-
 
 /* Сам график */
 .chart {
-    height  : 320px;    /* Высота фиксирована: 320 пикселей */
-    width   : 85%;      /* Ширина графика составляет 85% от ширины родительского контейнера */
+    height  : 400px;    /* Высота фиксирована: 320 пикселей */
+    width   : 100%;      /* Ширина графика составляет 85% от ширины родительского контейнера */
 }
 
-#chart_all_languages {
-    padding-top: 18px; /* пример */
-}
 
 /* ===== ПРУФЛИНКИ ПОД ТАБЛИЦАМИ ===== */
 
@@ -390,32 +398,81 @@ body {
 
 
 /* ============================ АДАПТИВНАЯ ВЕРСТКА ============================ */
-@media (max-width: 768px) {
+@media (max-width: 720px) {
 
-    /* ===== ШАПКА САЙТА ===== */
+    body {
+        font-size   : 8px;
+    }
+
+    /* ===== ШАПКА САЙТА (mobile) ===== */
     .site-header {
         padding: 13px 0; /* внутренний отступ сверху и снизу (13 пикселей), слева и справа — 0 */
     }
 
-    
 
-    /*!* ===== ГРАФИК ===== *!*/
+    /* ===== ЗАГОЛОВКИ (mobile) ===== */
 
-    /*!* Заголовок графика *!*/
-    /*.chart-title {*/
-    /*    font-size   : 15px; !* Размер текста заголовка *!*/
+    /*  Под шапкой */
+    .data-info {
+        font-size   : 15px;
+    }
+
+    /* Над графиками и таблицами */
+    .chart-title {
+        font-size   : 15px; /* Размер текста заголовка */
     /*    margin-top  : 22px; !* Внешний отступ сверху *!*/
     /*    font-weight : 500;  !* Толщина шрифта *!*/
-    /*}*/
+    }
 
-    /*!* Сам график *!*/
-    /*.chart {*/
-    /*    height  : 260px;    !* Высота фиксирована: 260 пикселей (совпадает с надписью с боку "количество открытых вакансий") *!*/
+    /* (Над графиками и таблицами) в скобках */
+    .title-sub {
+        display: block;
+        margin-top: 4px;
+        font-weight: 400;
+        font-size: 12px; /* по желанию */
+    }
+
+
+    /*!* ===== ГРАФИК (mobile)  ===== *!*/
+
+
+    /* Сам график */
+    .chart {
+        height  : 300px;    /* Высота фиксирована: 260 пикселей (совпадает с надписью с боку "количество открытых вакансий") */
     /*    width   : 100%;     !* Ширина графика 100% *!*/
     /*    padding : 0 16px;   !* Отступ от экрана слева для маленьких экранов *!*/
-    /*}*/
+    }
 
+    /* === ТАБЛИЦА === *//
+    .salary-table {
+        font-size: 9px;
+    }
 
+    .salary-table th,
+    .salary-table td {
+        padding: 4px 4px; /* по желанию: уменьшение отступов */
+    }
+
+    .salary-table img {
+        width: 18px; /* уменьшение иконок языков */
+        height: auto;
+        margin-right: 4px;
+        padding: 4px 4px;
+    }
+
+    /* Добавляем иконку сортировки */
+    .salary-table th[data-sortable]::after {
+        font-size: 8px;
+    }
+
+    /* Активная сортировка: стрелка вверх или вниз */
+    .salary-table th.sort-asc::after {
+        font-size: 8px;
+    }
+
+    .salary-table th.sort-desc::after {
+        font-size: 8px;
+    }
 
     /* ===== СТАТИЧНЫЙ ФУТЕР ===== */
     /* Уменьшаем шрифт в футере и отступ от низа экрана на мобильных */

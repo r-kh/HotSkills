@@ -7,26 +7,18 @@
 <!-- Начало блока контента -->
 {% block content %}
 
-<!-- прелоад иконок — РАНЬШЕ всего -->
-<script>
-    (async function preloadIcons() {
-        try {
-            const res = await fetch("/api/languages");
-            const languages = await res.json();
+<!-- прелоад иконок -->
+<script type="module">
+    import { loadLanguagesIfNeeded, getLanguageCodes } from '/static/js/api.js';
 
-            languages.forEach(({code}) => {
-                const link = document.createElement("link");
-                link.rel = "preload";
-                link.as = "image";
-                link.href = `/static/logos/${code}.webp`;
-                document.head.appendChild(link);
-            });
-        } catch (e) {
-            console.error("Ошибка при прелоаде иконок:", e);
-        }
-    })();
+    loadLanguagesIfNeeded().then(() =>
+        getLanguageCodes()?.forEach(code =>
+            document.head.insertAdjacentHTML("beforeend",
+                `<link rel="preload" as="image" href="/static/logos/${code}.webp">`
+            )
+        )
+    ).catch(e => console.error("Ошибка при прелоаде иконок:", e));
 </script>
-
 
 <!-- Информирование о статистике с HH.RU на текущую дату/время -->
 <div class="data-info">
@@ -36,7 +28,8 @@
 
 <!-- Заголовок графика 1 -->
 <div class="chart-title">
-    Разработчики ПО (спрос на разработчиков в данный момент)
+    Разработчики ПО<br>
+    <span class="title-sub">(спрос на разработчиков в данный момент)</span>
 </div>
 
 
@@ -59,8 +52,9 @@
 <!-- Блок зарплат -->
 
 <!-- Заголовок для таблицы с зарплатами по языкам программирования. Если удалить, не будет отображаться заголовок. -->
-<div class="chart-title" style="margin-top: 40px;">
-    Зарплатные вилки по языкам программирования (на основе текущих открытых вакансий с прописанным окладом и после налогов)
+<div class="chart-title">
+    Зарплатные вилки по языкам программирования<br>
+    <span class="title-sub">(на основе текущих открытых вакансий с прописанным окладом и после налогов)</span>
 </div>
 
 
@@ -84,7 +78,7 @@
         </tr>
         </thead>
         <tbody>
-            <!-- Здесь контент отрабатывает scripts.js (логотипы, названия языков, вакансии, зарплаты) -->
+            <!-- Здесь контент отрабатывает table.js (логотипы, названия языков, вакансии, зарплаты) -->
         </tbody>
     </table>
 </div>
@@ -106,7 +100,8 @@
 
 <!-- Заголовок графика 2 -->
 <div class="chart-title">
-    Языки программирования (динамика популярности в открытых вакансиях по разработке в данный момент)
+    Языки программирования<br>
+    <span class="title-sub">(динамика популярности в открытых вакансиях по разработке в данный момент)</span>
 </div>
 
 
@@ -118,11 +113,11 @@
 
 
 <!-- Подключение библиотеки Plotly для отображения графиков. Если удалить, графики не будут отображаться, так как эта библиотека не будет загружена. -->
-<script defer src="https://cdn.plot.ly/plotly-basic-latest.min.js"></script>
-
-<!-- Подключение JavaScript-файла (интерактивные элементы, графики, анимации и т.д.) -->
-<script src="/static/scripts.js" defer></script>
-
+<!--<script defer src="https://cdn.plot.ly/plotly-basic-latest.min.js"></script>-->
+<script defer src="/static/libs/plotly-basic-latest.min.js"></script>
+<!--<link rel="preload" href="/static/libs/plotly-basic-latest.min.js">-->
+<!-- Подключение JavaScript-файлов (интерактивные элементы, графики, таблицы и т.д.) -->
+<script type="module" src="/static/js/scripts.js" defer></script>
 
 {% endblock %}
 <!-- Закрытие блока контента. -->

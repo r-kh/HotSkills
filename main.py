@@ -39,9 +39,9 @@ async def lifespan(app: FastAPI):
 
     # Загружаем языки один раз при запуске и сохраняем в app.state
     async with app.state.db_pool.acquire() as conn:
-        rows = await conn.fetch("SELECT code, name FROM programming_languages ORDER BY id")
+        rows = await conn.fetch("SELECT code, name, color FROM programming_languages ORDER BY id")
         # Сохраняем как список словарей
-        app.state.languages = [{"code": row["code"], "name": row["name"]} for row in rows]
+        app.state.languages = [{"code": row["code"], "name": row["name"], "color": row["color"]} for row in rows]
 
 
     # --- тут FastAPI начинает работать ---
@@ -119,63 +119,29 @@ async def get_salaries():
         async with db_pool.acquire() as conn:
 
             # Достаём одну (последнюю по дате) запись с зарплатами (DESC/DESCENDING значит «по убыванию»)
-            salary_row = await conn.fetchrow("SELECT * FROM salaries ORDER BY date DESC LIMIT 1")
+            salaries_last_row = await conn.fetchrow("SELECT * FROM salaries ORDER BY date DESC LIMIT 1")
 
     except asyncpg.exceptions.PostgresError as e:
         logging.error(f"Ошибка при запросе к базе данных: {e}")         # Логируем ошибку (иначе не узнаем о проблемах)
         return JSONResponse(status_code=500, content={"error": str(e)}) # Отправляем клиенту ошибку 500 (иначе клиент не узнает о проблеме)
 
-    # Форматирование отображения вилки зарплат
-    def format_range(start, end):
-        if start == 0 and end == 0:
-            return "нет данных"  # Если нет данных — выводим заглушку
-        # Округляем до сотен
-        start = round(start, -2)
-        end = round(end, -2)
-        # Сначала форматируем с разделением на тысячи, а потом меням на пробелы '1,250,000' → '1 250 000'
-        # потом добавляем символ рубля и по 2 пробела по бокам (отображается в таблице зарплат в index.html)
-        return f"{start:,} ₽&nbsp;&nbsp;–&nbsp;&nbsp;{end:,} ₽".replace(",", " ")
+    # salaries_last_row - это объект asyncpg.Record, нужно конвертировать в словарь чтобы потом получилось сериализовать в JSON (иначе упадёт с ошибкой)
+    salaries_last_row_dict = dict(salaries_last_row) if salaries_last_row else {}
 
-    result = []  # Здесь будет готовый список данных по зарплатам
-
-    # Формируем данные "язык - зарплатные вилки"
-    for lang in app.state.languages:
-        code = lang["code"]  # Код языка (например, "cpp")
-        name = lang["name"]  # Название языка (например, "C++")
-        salary_data = salary_row.get(code)  # Получаем по языку зарплатные данные по Москве и России (по всем 4 категориям)
-
-        # Если данных нет или их длина не соответствует ожиданию — подставляем "нет данных"
-        if not salary_data or len(salary_data) != 16:
-            moscow = ["нет данных"] * 4
-            russia = ["нет данных"] * 4
-        else:
-            # Формируем 4 диапазона зарплат по Москве
-            moscow = [format_range(salary_data[i], salary_data[i + 1]) for i in range(0, 8, 2)]
-            # - Создаёт список из 4 зарплатных вилок (нижняя и верхняя граница) для Москвы
-            # - Берёт пары значений из salary_data: [0–1], [2–3], [4–5], [6–7]
-
-            # Формируем 4 диапазона по России
-            russia = [format_range(salary_data[i], salary_data[i + 1]) for i in range(8, 16, 2)]
-            # - Аналогично, создаёт список из 4 зарплатных вилок для России
-            # - Берёт пары значений: [8–9], [10–11], [12–13], [14–15]
-
-        # Добавляем данные по текущему языку в результат
-        result.append({
-            "name"  : name,
-            "code"  : code,
-            "moscow": moscow,
-            "russia": russia
-        })
+    # Удаляем поле date, (сейчас на фронте оно пока не нужно)
+    salaries_last_row_dict.pop('date', None)
 
     # Сохраняем результат в Redis на 60 минут (ex=3600 секунд)
-    await redis_pool.set("salaries", json.dumps(result), ex=3600)
+    await redis_pool.set("salaries", json.dumps(salaries_last_row_dict), ex=3600)
 
     # Возвращаем результат в виде JSON
-    return JSONResponse(content=result)
+    return JSONResponse(content=salaries_last_row_dict)
 
 
 # --- API: получение списка языков программирования ---
 @app.get("/api/languages")
+# Пример ответа на фронт:
+# [{"code":"one_c","name":"1C","color":"#E31E24"},...]
 # Обработчик GET-запроса по маршруту /api/languages
 async def get_languages():
 
@@ -203,6 +169,9 @@ async def get_languages():
 # --- API: данные по вакансиям ---
 @app.get("/api/vacancy-statistics", response_class=JSONResponse)
 @app.get("/api/vacancy-statistics/{query}", response_class=JSONResponse)
+# Пример ответа на фронт:
+# {            "python": {"daily": [["2025-05-22", [1200, 1600]], ..], "hourly": [["2025-05-23 20:00:00", [1100, 1500]], ..]},
+#  "software_developer": {"daily": [["2025-05-22",       14500 ], ..], "hourly": [["2025-05-23 20:00:00",       14700 ], ..}}
 # Обработчик GET-запроса по маршруту /api/vacancy-statistics
 async def get_vacancy_statistics(query: str = None):
 
