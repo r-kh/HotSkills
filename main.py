@@ -85,15 +85,30 @@ async def show_lang_page(request: Request, lang: str):
             lang.lower()    # на случай, если пользователь пришлёт /Python или /JAVA
         )
 
-    # Если язык не найден — 404
-    if not row:
-        return HTMLResponse(content="Страница не найдена", status_code=404)
+        # Если язык не найден — 404
+        if not row:
+            return HTMLResponse(content="Страница не найдена", status_code=404)
+
+        skills = []
+
+        skill_row = await conn.fetchrow(
+            f"SELECT {row['code']} FROM hot_skills WHERE date = CURRENT_DATE"
+        )
+
+        if skill_row and skill_row[row["code"]]:
+            # Преобразуем JSONB (строку) в словарь
+            skill_data = json.loads(skill_row[row["code"]])
+            skills = [
+                {"skill": k, "vacancy_count": v}
+                for k, v in sorted(skill_data.items(), key=lambda item: -item[1])[:20]
+            ]
 
     # Возвращаем отрендереный шаблон lang.html (с code и name)
     return templates.TemplateResponse("lang.html", {
         "request": request,
         "code"   : row["code"],  # для логотипов/таблиц/графиков
         "name"   : row["name"],  # для правильного отображения языка на страницах
+        "skills" : skills        # навыки и их счётчик в пилюлях которые отображаются на странице языка
     })
 
 
