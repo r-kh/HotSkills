@@ -1,38 +1,29 @@
-/* Orbitron 600 */
-@font-face {
-    font-family: 'Orbitron';
-    src: url('/static/fonts/Orbitron-SemiBold.ttf') format('truetype');
-    font-weight: 600;
-    font-style: normal;
-    font-display: swap;
-}
+/*!* Orbitron 600 *!*/
+/*@font-face {*/
+/*    font-family: 'Orbitron';*/
+/*    src: url('/static/fonts/Orbitron-SemiBold.ttf') format('truetype');*/
+/*    font-weight: 600;*/
+/*    font-style: normal;*/
+/*    font-display: swap;*/
+/*}*/
 
-/* Exo 2 400 */
-@font-face {
-    font-family: 'Exo 2';
-    src: url('/static/fonts/Exo2-Regular.ttf') format('truetype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
+/*!* Exo 2 400 *!*/
+/*@font-face {*/
+/*    font-family: 'Exo 2';*/
+/*    src: url('/static/fonts/Exo2-Regular.ttf') format('truetype');*/
+/*    font-weight: 400;*/
+/*    font-style: normal;*/
+/*    font-display: swap;*/
+/*}*/
 
-/* Exo 2 500 */
-@font-face {
-    font-family: 'Exo 2';
-    src: url('/static/fonts/Exo2-Medium.ttf') format('truetype');
-    font-weight: 500;
-    font-style: normal;
-    font-display: swap;
-}
-
-/* Exo 2 600 */
-@font-face {
-    font-family: 'Exo 2';
-    src: url('/static/fonts/Exo2-SemiBold.ttf') format('truetype');
-    font-weight: 600;
-    font-style: normal;
-    font-display: swap;
-}
+/*!* Exo 2 600 *!*/
+/*@font-face {*/
+/*    font-family: 'Exo 2';*/
+/*    src: url('/static/fonts/Exo2-SemiBold.ttf') format('truetype');*/
+/*    font-weight: 600;*/
+/*    font-style: normal;*/
+/*    font-display: swap;*/
+/*}*/
 
 
 /* Обнуляем html и body, чтобы сделать стартовую точку максимально "чистой" и одинаковой во всех браузерах. */
@@ -130,7 +121,6 @@ body {
 /* ===== ГРАФИК ===== */
 /* Заголовок графика */
 .chart-title {
-    /*font-size       : 14px;     !* размер шрифта *!*/
     font-weight     : 600;      /* жирность шрифта - 400 - обычный, 600 - полужирный, 900 - очень жирный */
     margin-top      : 8px;     /* это отступ сверху */
     margin-bottom   : 8px;      /* это отступ снизу */
@@ -138,47 +128,53 @@ body {
 
 /* (Заголовок графика) Информация в скобках */
 .title-sub {
-    font-weight: 400;
+    font-weight     : 400;
     color           : #808080;
     font-size       : 15px;
-    /*display: block;*/
-    /*margin-top: 4px; !* по желанию *!*/
 }
 
 /* Контейнер графика */
 .chart-container {
-    margin          : auto;   /* 0 - внешние отступы сверху и снизу; auto - слева и справа*/
+    margin          : auto;     /* 0 - внешние отступы сверху и снизу; auto - слева и справа*/
     padding         : 10px;
-    max-width       : 1400px;
+    max-width       : 1400px;   /* Ограничение ширины (отталкивался от мониторов 1366x768 - там смотрится гармонично) */
     display         : flex;     /* Включает флексбокс, чтобы элементы внутри (img, div, текст и т.д.) шли в одну строку по горизонтали (по умолчанию flex-direction: row). */
     justify-content : center;   /* Горизонтальное выравнивание: всё содержимое будет по центру контейнера. */
     align-items     : center;   /* Вертикальное выравнивание: элементы по центру высоты контейнера (если есть высота). */
-    /*margin-top      : -6px;     !* Поднимает контейнер чуть выше (удаляет "пустое" пространство сверху). *!*/
 }
 
 /* Сам график */
 .chart {
-    height  : 400px;    /* Высота фиксирована: 320 пикселей */
+    height  : 400px;     /* Высота наиболее удобная для графика в варианте с вакансиями */
     width   : 100%;      /* Ширина графика составляет 85% от ширины родительского контейнера */
+}
+
+/* График для языков */
+#chart_all_languages {
+    height: 450px !important; /* из-за легенды должен быть выше */
 }
 
 
 /* ===== ПРУФЛИНКИ ПОД ТАБЛИЦАМИ ===== */
 
+/* Доп.информация под графиком */
 .chart-source {
     font-size       : 12px;
     color           : #777;
     margin-top      : 5px;
-    width: 100%; /* заставляем <p> растянуться */
-    display: block;
-    /*margin-left     : auto; !* сдвигает элемент вправо *!*/
+    width           : 100%; /* заставляем <p> растянуться */
+    display         : block;
     text-align      : center; /* Добавь это для центрирования */
-    margin-bottom   : 40px; /* Отступ снизу — чтобы элементы ниже не прилипали слишком близко. */
+    margin-bottom   : 60px; /* Отступ снизу — чтобы элементы ниже не прилипали слишком близко. */
 }
+
+/* Стилизация ссылок */
 .chart-source a {
     color: #777;
     text-decoration: underline;
 }
+
+/* Поведение ссылок при наведении */
 .chart-source a:hover {
     color: #b30000;
 }
@@ -187,12 +183,15 @@ body {
 
 
 /* ===== СПИСОК ТЕГОВ НАВЫКОВ ===== */
+
+/* Основной контейнер */
 .skills-tag-list {
     display         : flex;         /* Используем флексбокс для выравнивания тегов в строку */
     flex-wrap       : wrap;         /* Разрешаем перенос тегов на следующую строку, если они не помещаются */
     gap             : 10px;         /* Отступ между тегами — и по горизонтали, и по вертикали */
     list-style      : none;         /* Убираем маркеры (точки) у <li> элементов */
-    margin-top      : 10px;         /* Отступ сверху от предыдущего блока */
+    margin-top      : 30px;         /* Отступ сверху от предыдущего блока */
+    margin-bottom   : 30px;         /* Отступ сверху от предыдущего блока */
     justify-content : center;       /* Горизонтальное выравнивание: всё содержимое будет по центру контейнера. */
 }
 
@@ -200,9 +199,9 @@ body {
 .skill-tag {
     background-color    : #f2f2f2;                      /* фоновый цвет тега; */
     border              : 2px solid #ccc;               /* тонкая рамка; */
-    color               : #333;                         /* цвет текста; */
+    color               : black;                         /* цвет текста; */
     font-size           : 14px;                         /* размер текста; */
-    font-weight         : 500;                          /* Жирный текст */
+    font-weight         : 400;                          /* Жирный текст */
     padding             : 6px 12px;                     /* внутренние отступы — добавляют «воздуха» внутри тега; */
     border-radius       : 16px;                         /* скругление углов (16px — делает его похожим на капсулу/пилюлю); */
     transition          : background-color 0.2s ease;   /* плавная анимация изменения цвета при наведении (если будет :hover). */
@@ -222,7 +221,7 @@ body {
   border            : 1px solid #ccc;               /* Тонкая светло-серая рамка вокруг таблицы */
   border-radius     : 4px;                          /* Скругление углов таблицы */
   box-shadow        : 0 2px 8px rgba(0, 0, 0, 0.08);/* Мягкая тень для объёмности */
-  margin            : 40px auto;          /* Отступ сверху/снизу 40px, по центру по горизонтали */
+  margin            : 25px auto 10px;               /* Отступ сверху 25, слева/справа auto, снизу 10 */
   max-width         : 1400px;                       /* Максимальная ширина таблицы */
   overflow          : hidden;                       /* Обрезает всё, что выходит за границы таблицы (например, тени) */
   background-color  : #fff;                         /* Белый фон таблицы */
@@ -401,9 +400,12 @@ body {
 /* ============================ АДАПТИВНАЯ ВЕРСТКА ============================ */
 @media (max-width: 720px) {
 
+
+    /* === Базовый размер шрифта для всего документа (mobile) === */
     body {
         font-size   : 8px;
     }
+
 
     /* ===== ШАПКА САЙТА (mobile) ===== */
     .site-header {
@@ -421,44 +423,61 @@ body {
     /* Над графиками и таблицами */
     .chart-title {
         font-size   : 15px; /* Размер текста заголовка */
-    /*    margin-top  : 22px; !* Внешний отступ сверху *!*/
-    /*    font-weight : 500;  !* Толщина шрифта *!*/
     }
 
     /* (Над графиками и таблицами) в скобках */
     .title-sub {
-        display: block;
-        margin-top: 4px;
-        font-weight: 400;
-        font-size: 12px; /* по желанию */
+        display     : block;
+        margin-top  : 4px;
+        font-weight : 400;
+        font-size   : 12px;
     }
 
 
-    /*!* ===== ГРАФИК (mobile)  ===== *!*/
+    /* ===== ГРАФИК (mobile)  ===== */
 
+    /* Контейнер графика */
+    .chart-container {
+        padding: 5px 5px 0 0;     /* Внешний отступ сверху и справа по 5 пикселей */
+    }
 
     /* Сам график */
     .chart {
         height  : 300px;    /* Высота фиксирована: 260 пикселей (совпадает с надписью с боку "количество открытых вакансий") */
-    /*    width   : 100%;     !* Ширина графика 100% *!*/
-    /*    padding : 0 16px;   !* Отступ от экрана слева для маленьких экранов *!*/
     }
 
-    /* === ТАБЛИЦА === *//
+    /* Доп.информация под графиком */
+    .chart-source {
+        margin-top    : 0px;   /* Внешний отступ сверху от предыдущего блока */
+        margin-bottom : 40px;  /* Внешний отступ сверху от предыдущего блока */
+    }
+
+
+    /* === ТАБЛИЦА (mobile) === */
+
+    /* Обёртка таблицы зарплат */
+    .salary-table-wrapper {
+        margin-top    : 0px;
+        margin-bottom : 5px;
+    }
+
+    /* Таблица зарплат */
     .salary-table {
         font-size: 9px;
     }
 
+    /* Ячейки таблицы зарплат (заголовки и данные) */
     .salary-table th,
     .salary-table td {
-        padding: 4px 4px; /* по желанию: уменьшение отступов */
+        padding: 4px 4px; /* уменьшение отступов */
     }
 
+    /* Иконки языков в таблице зарплат */
     .salary-table img {
-        width: 18px; /* уменьшение иконок языков */
-        height: auto;
+        width       : 18px; /* уменьшение иконок языков */
+        height      : auto;
         margin-right: 4px;
-        padding: 4px 4px;
+        padding     : 4px 4px;
     }
 
     /* Добавляем иконку сортировки */
@@ -471,13 +490,27 @@ body {
         font-size: 8px;
     }
 
+    /* Стилизация иконки сортировки по убыванию в заголовке таблицы */
     .salary-table th.sort-desc::after {
         font-size: 8px;
+    }
+
+    /* Стили для каждой вкладки */
+    .salary-table-wrapper .tab {
+        padding: 7px 15px; /* Отступ внутри вкладки */
+    }
+
+    /* ===== СПИСОК ТЕГОВ НАВЫКОВ ===== */
+    .skills-tag-list {
+        padding: 0;
+        margin-top: 10px;
+        margin-bottom: 20px;
     }
 
     /* ===== СТАТИЧНЫЙ ФУТЕР ===== */
     /* Уменьшаем шрифт в футере и отступ от низа экрана на мобильных */
     .footer {
+        margin-top      : 10px;  /* Внешний отступ сверху от предыдущего блока */
         font-size       : 12px; /* Уменьшаем размер шрифта */
         line-height     : 0.6;  /* вертикальный интервал между строками */
         margin-bottom   : 10px; /* пространство от футера до края экрана */

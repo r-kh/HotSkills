@@ -4,34 +4,43 @@
 
 {% block content %}
 <div class="container">
-    <h1>{{ name }}</h1>
-    <!-- Информирование о статистике с HH.RU на текущую дату/время -->
-    <p>Это страница статистики с <strong>HH.RU</strong> для языка: <strong>{{ name }}</strong> на <span id="current-datetime"></span></p>
-    <p>Список самых востребованных ключевых навыков для данного языка на данный момент в открытых вакансиях.</p>
-    <div class="container-page">
-        {% if skills %}
-        <ul class="skills-tag-list">
-            {% for skill, vacancy_count in skills.items() %}
-            <li class="skill-tag" title="Вакансий: {{ vacancy_count }}">
-                {{ skill }} <span class="vacancy-count">({{ vacancy_count }})</span>
-            </li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <p>Навыки пока не загружены.</p>
-        {% endif %}
-    </div>
+    <h1 style="color: #b30000;">{{ name }}</h1>
 </div>
 
-<!-- Центровой страничный контейнер ограничивающий ширину (чтобы содержимое при ультра широких экранах не съехало в бок) -->
+
+<!-- Заголовок для навыков. -->
+<div class="chart-title">
+    Список самых востребованных ключевых навыков для языка на данный момент в вакансиях.<br>
+    <!-- Информирование о статистике с HH.RU на текущую дату/время -->
+    <span class="title-sub">(cтатистика с <strong>HH.RU</strong> на <span id="current-datetime"></span>)</span>
+</div>
+
+
+<!-- Навыки со счетчиками упоминаний в вакнсиях (в виде пилюль) -->
+<div class="container-page">
+    {% if skills %}
+    <ul class="skills-tag-list">
+        {% for skill, vacancy_count in skills.items() %}
+        <li class="skill-tag" title="Вакансий: {{ vacancy_count }}">
+            {{ skill }} <span class="vacancy-count">({{ vacancy_count }})</span>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>Навыки пока не загружены.</p>
+    {% endif %}
+</div>
+
+
+<!-- Вспомогательныя информация по навыкам (откуда берётся и как часто обновляется) -->
 <div class="container-page">
     <p class="chart-source">
-        Навыки собираются с последних, свежих по дате вакансий, связанных с выбранным языком программирования.<br>
-        (для анализа используется до 2000 последних вакансий, где в названии вакансии фигурирует название языка)<br>
-        Затем навыки сортируются по частоте упоминаний, и отображаются 20 самых востребованных.<br>
-        (обновление списка для поддержки актуальности происходит каждый день)
+        Для сбора навыков берутся последние по дате вакансии с именем языка в названии (но не более 2000 вакансий)<br>
+        Навыки сортируются по частоте упоминаний, и отображаются 20 самых востребованных.<br>
+        (обновление списка происходит каждый день)
     </p>
 </div>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
