@@ -11,9 +11,9 @@
     <div class="container-page">
         {% if skills %}
         <ul class="skills-tag-list">
-            {% for skill in skills %}
-            <li class="skill-tag" title="Вакансий: {{ skill.vacancy_count }}">
-                {{ skill.skill }} <span class="vacancy-count">({{ skill.vacancy_count }})</span>
+            {% for skill, vacancy_count in skills.items() %}
+            <li class="skill-tag" title="Вакансий: {{ vacancy_count }}">
+                {{ skill }} <span class="vacancy-count">({{ vacancy_count }})</span>
             </li>
             {% endfor %}
         </ul>

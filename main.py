@@ -78,37 +78,52 @@ async def index(request: Request):
 # ловим URL с переменной lang (код языка), передаём её в асинхронную функцию-обработчик и возвращаем HTML
 async def show_lang_page(request: Request, lang: str):
 
-    async with app.state.db_pool.acquire() as conn:    # Получаем соединение из пула БД (иначе запрос не отправить)
+    # Получаем доступ к пулам соединений с БД и Redis
+    db_pool    = app.state.db_pool
+    redis_pool = app.state.redis_pool
+
+    # Получаем соединение с базой данных
+    async with db_pool.acquire() as conn:
         # ищем язык (name, code) по коду (lang)
         row = await conn.fetchrow(
             "SELECT code, name FROM programming_languages WHERE code = $1",
             lang.lower()    # на случай, если пользователь пришлёт /Python или /JAVA
         )
 
-        # Если язык не найден — 404
+        # Если язык не найден — возвращаем ошибку 404 (страница не существует)
         if not row:
             return HTMLResponse(content="Страница не найдена", status_code=404)
 
-        skills = []
+        skills = []  # список навыков
 
-        skill_row = await conn.fetchrow(
-            f"SELECT {row['code']} FROM hot_skills WHERE date = CURRENT_DATE"
-        )
+        # Формируем ключ для Redis по коду языка, чтобы хранить/достать кэшированные навыки без даты (Без ключа не сможем получить/записать данные в Redis)
+        cache_key = f"skills:{row['code']}"
 
-        if skill_row and skill_row[row["code"]]:
-            # Преобразуем JSONB (строку) в словарь
-            skill_data = json.loads(skill_row[row["code"]])
-            skills = [
-                {"skill": k, "vacancy_count": v}
-                for k, v in sorted(skill_data.items(), key=lambda item: -item[1])[:20]
-            ]
+        # Пробуем сначала получить кешированные данные из Redis по ключу (если убрать, будем постоянно читать из БД)
+        cached_skills = await redis_pool.get(cache_key)
+        # Если кеш есть
+        if cached_skills:
+            logging.info("Возвращаем данные из кеша")  # Логируем, что используются кэшированные данные из Redis
+            skills = json.loads(cached_skills)         # Если кэш найден — десериализуем JSON в Python-объект (список или словарь)
+
+        else:
+            # Если в кэше нет — читаем из базы последние свежие данные для языка
+            skill_row = await conn.fetchrow(
+                f"SELECT {row['code']} FROM hot_skills ORDER BY date DESC LIMIT 1"
+            )
+
+            if skill_row and skill_row[row["code"]]:
+                skills = json.loads(skill_row[row["code"]])                    # Если данные есть, десериализуем из JSON
+                await redis_pool.set(cache_key, json.dumps(skills), ex=86400)  # Кэшируем полученные данные в Redis на 24 часа (данные обновляются раз в день)
+            else:
+                skills = []  # Если данных нет — оставляем пустым, чтобы не сломать шаблон и корректно обработать отсутствие данных
 
     # Возвращаем отрендереный шаблон lang.html (с code и name)
     return templates.TemplateResponse("lang.html", {
-        "request": request,
+        "request": request,      # объект HTTP-запроса, который пришёл от клиента (браузера или другого клиента) (Он содержит всю информацию о текущем запросе: URL, заголовки, параметры, куки, тело и т.д.)
         "code"   : row["code"],  # для логотипов/таблиц/графиков
         "name"   : row["name"],  # для правильного отображения языка на страницах
-        "skills" : skills        # навыки и их счётчик в пилюлях которые отображаются на странице языка
+        "skills" : skills        # навыки и их частота упоминаний в пилюлях которые отображаются на странице языка
     })
 
 
