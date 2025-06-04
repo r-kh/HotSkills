@@ -220,13 +220,18 @@ async def get_vacancy_statistics(query: str = None):
         """
         return await conn.fetch(sql_query)
 
-    # сбор данных по дням
+    # сбор данных по дням (берётся самая поздняя запись с каждого дня)
     async def fetch_daily(conn, table, columns):
         sql_query = f"""
-            SELECT DISTINCT ON (DATE(date)) DATE(date) AS date, {columns}
-            FROM {table}
-            WHERE date >= NOW() - INTERVAL '31 days'
-            ORDER BY DATE(date), date DESC;
+            SELECT date::date AS date, {columns}
+            FROM (
+                SELECT *,
+                       ROW_NUMBER() OVER (PARTITION BY date::date ORDER BY date DESC) AS rn
+                FROM {table}
+                WHERE date >= NOW() - INTERVAL '31 days'
+            ) sub
+            WHERE rn = 1
+            ORDER BY date;
         """
         return await conn.fetch(sql_query)
 
