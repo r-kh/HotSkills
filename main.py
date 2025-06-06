@@ -303,3 +303,4 @@ async def get_vacancy_statistics(query: str = None):
 # --- Запуск при старте ---
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, log_level="info")
+    # uvicorn.run("main:app", host="127.0.0.0", port=8000, log_level="info", workers=2, timeout_keep_alive=30) # при запуске 2 воркеров текущем железе происходит нехватка оперативной памяти и приложение крашится
