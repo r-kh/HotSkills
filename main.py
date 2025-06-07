@@ -228,7 +228,7 @@ async def get_vacancy_statistics(query: str = None):
                 SELECT *,
                        ROW_NUMBER() OVER (PARTITION BY date::date ORDER BY date DESC) AS rn
                 FROM {table}
-                WHERE date >= NOW() - INTERVAL '31 days'
+                WHERE date >= NOW() - INTERVAL '30 days'
             ) sub
             WHERE rn = 1
             ORDER BY date;

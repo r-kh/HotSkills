@@ -275,7 +275,7 @@ export const initCharts = async () => {
             vacancyStats            : {software_developer: getVacanciesData()['software_developer']},
             chartEntities           : [{code: 'software_developer', name: 'Разработчик ПО', color: 'crimson'}],
             switchable              : true,
-            defaultView             : 'hourly',
+            defaultView             : 'daily',
             showLegend              : false,
         });
 
