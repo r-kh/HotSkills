@@ -34,7 +34,6 @@ from contextlib import asynccontextmanager       # для запуска/зав�
 
 # --- Сторонние библиотеки ---
 import asyncpg                                   # Работа с PostgreSQL (async)
-import redis.asyncio as redis                    # Кэширование часто запрашиваемых данных (async)
 import uvicorn                                   # Сервер ASGI(Asynhronus Server Gateway Interface)
 from fastapi import FastAPI, Request             # FastAPI и Request для Jinja
 from fastapi.responses import HTMLResponse       # Ответы в формате HTML-страниц
@@ -43,16 +42,9 @@ from fastapi.staticfiles import StaticFiles      # Подключение /stati
 from fastapi.templating import Jinja2Templates   # Генератор HTML-страниц с динамическими данными
 from jinja2 import Environment, FileSystemLoader # Настройка Jinja2 для рендера HTML-шаблонов
 
-# --- Импорт конфигурации ---
-from config import (
-    DB_CONFIG,
-    REDIS_URL,
-    STATIC_DIR,
-    TEMPLATES_DIR,
-    CACHE_TTL_HOUR,
-    CACHE_TTL_DAY,
-    CACHE_TTL_NO_EXPIRY
-)
+# --- Модули проекта ---
+from config import STATIC_DIR, TEMPLATES_DIR, CACHE_TTL_HOUR, CACHE_TTL_DAY, CACHE_TTL_NO_EXPIRY
+from db import init_db_pool, close_db_pool, init_redis_pool, close_redis_pool
 
 
 # --- Жизненный цикл приложения FastAPI
@@ -67,12 +59,9 @@ async def lifespan(application: FastAPI):
 
     # --- Инициализация ресурсов (Startup) ---
 
-    # Создание и настройка пула соединений с БД
-    # 1 сессия БД = ~ work_mem + temp_buffers, установлено 4, можно больше (отталкиваться от RAM)
-    application.state.db_pool = await asyncpg.create_pool(**DB_CONFIG, min_size=1, max_size=4)
-
-    # Подключение к Redis (для кэширования и быстрого доступа к данным Redis)
-    application.state.redis_pool = await redis.from_url(REDIS_URL)
+    # Инициализация пулов соединений с БД PostgreSQL + Redis(кэширование/быстрый доступ к данным)
+    application.state.db_pool = await init_db_pool()
+    application.state.redis_pool = await init_redis_pool()
 
     # Загружаем языки один раз при запуске и сохраняем в app.state
     async with application.state.db_pool.acquire() as conn:
@@ -90,13 +79,10 @@ async def lifespan(application: FastAPI):
 
     # --- Очистка ресурсов (Shutdown) ---
 
-    # Закрытие пула соединений с БД при завершении приложения
-    # (иначе соединения с БД останутся открытыми -> утечка ресурсов)
-    await application.state.db_pool.close()
-
-    # Закрытие соединения с Redis при завершении приложения
-    # (иначе Redis-соединение останется активным -> утечка соединений и потенциальные ошибки)
-    await application.state.redis_pool.close()
+    # Закрытие пула соединений с БД и Redis при завершении приложения
+    # (иначе соединения с БД и Redis останутся открытыми -> утечка ресурсов)
+    await close_db_pool(application.state.db_pool)
+    await close_redis_pool(application.state.redis_pool)
 
 
 # --- Создаем экземпляр приложения (пока без доп.параметров title, description, version...)
