@@ -28,7 +28,6 @@ FastAPI-приложение для отображения информации 
 """
 
 # --- Стандартные библиотеки ---
-import os                                        # Работа с переменными окружения
 import json                                      # Сериализация
 import logging                                   # Отслеживание работы/диагностика проблем
 from contextlib import asynccontextmanager       # для запуска/завершения FastAPI
@@ -44,15 +43,16 @@ from fastapi.staticfiles import StaticFiles      # Подключение /stati
 from fastapi.templating import Jinja2Templates   # Генератор HTML-страниц с динамическими данными
 from jinja2 import Environment, FileSystemLoader # Настройка Jinja2 для рендера HTML-шаблонов
 
-
-# --- Конфигурация базы данных (берётся из переменных окружения) ---
-DB_CONFIG = {
-    "host"      : os.getenv("DB_HOST"),
-    "database"  : os.getenv("DB_NAME"),
-    "user"      : os.getenv("DB_USER"),
-    "password"  : os.getenv("DB_PASSWORD"),
-    "ssl"       : os.getenv("DB_SSL") == "True"
-}
+# --- Импорт конфигурации ---
+from config import (
+    DB_CONFIG,
+    REDIS_URL,
+    STATIC_DIR,
+    TEMPLATES_DIR,
+    CACHE_TTL_HOUR,
+    CACHE_TTL_DAY,
+    CACHE_TTL_NO_EXPIRY
+)
 
 
 # --- Жизненный цикл приложения FastAPI
@@ -72,7 +72,7 @@ async def lifespan(application: FastAPI):
     application.state.db_pool = await asyncpg.create_pool(**DB_CONFIG, min_size=1, max_size=4)
 
     # Подключение к Redis (для кэширования и быстрого доступа к данным Redis)
-    application.state.redis_pool = await redis.from_url(os.getenv("REDIS_HOST"))
+    application.state.redis_pool = await redis.from_url(REDIS_URL)
 
     # Загружаем языки один раз при запуске и сохраняем в app.state
     async with application.state.db_pool.acquire() as conn:
@@ -106,10 +106,10 @@ app = FastAPI(lifespan=lifespan)
 # --- Подключаем статические файлы (/static) и шаблоны (HTML) в FastAPI-приложение ---
 
 # подключение CSS, JS, изображений
-app.mount("/static", StaticFiles(directory=os.getenv("STATIC_DIR")), name="static")
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 # шаблоны HTML (через Jinja2) (надо попробовать переехать на React/Vue)
-templates = Jinja2Templates(env=Environment(loader=FileSystemLoader(os.getenv("TEMPLATES_DIR"))))
+templates = Jinja2Templates(env=Environment(loader=FileSystemLoader(TEMPLATES_DIR)))
 
 
 # --- Главная страница сайта (index.html) ---
@@ -175,7 +175,7 @@ async def show_lang_page(request: Request, lang: str):
                 skills = json.loads(skill_row[row["code"]])
 
                 # Кэшируем полученные данные в Redis на 24 часа (данные обновляются раз в день)
-                await redis_pool.set(cache_key, json.dumps(skills), ex=86400)
+                await redis_pool.set(cache_key, json.dumps(skills), ex=CACHE_TTL_DAY)
             else:
                 # Если данных нет — оставляем пустым,
                 # чтобы не сломать шаблон и корректно обработать отсутствие данных
@@ -238,7 +238,7 @@ async def get_salaries():
     salaries_last_row_dict.pop('date', None)
 
     # Сохраняем результат в Redis на 60 минут (ex=3600 секунд)
-    await redis_pool.set("salaries", json.dumps(salaries_last_row_dict), ex=3600)
+    await redis_pool.set("salaries", json.dumps(salaries_last_row_dict), ex=CACHE_TTL_HOUR)
 
     # Возвращаем результат в виде JSON
     return JSONResponse(content=salaries_last_row_dict)
@@ -271,7 +271,7 @@ async def get_languages():
     # Сохраняем результат в кеш Redis бессрочно, языки не часто обновляются
     # (иначе каждый запрос будет идти в БД)
     # (если я добавлю новые языки, я перезапущу руками)
-    await redis_pool.set("languages", json.dumps(languages))
+    await redis_pool.set("languages", json.dumps(languages), ex=CACHE_TTL_NO_EXPIRY)
 
     # Возвращаем данные в виде JSON
     return JSONResponse(content=languages)
@@ -381,7 +381,7 @@ async def get_vacancy_statistics(query: str = None):
 
         # --- Кешируем сформированный результат в Redis на 1 час (3600 сек) ---
         # Сохраняем результат для быстрого доступа, иначе каждый запрос будет грузить БД
-        await redis_pool.set(cache_key, json.dumps(result), ex=3600)
+        await redis_pool.set(cache_key, json.dumps(result), ex=CACHE_TTL_HOUR)
 
         # --- Возвращаем ответ клиенту ---
         # Отдаем собранные данные в JSON формате, иначе клиент не получит ответ
