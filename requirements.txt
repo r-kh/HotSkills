@@ -1,0 +1,8 @@
+asyncpg
+black
+fastapi
+jinja2
+mypy
+pylint
+redis
+uvicorn
