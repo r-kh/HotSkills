@@ -45,6 +45,7 @@ from jinja2 import Environment, FileSystemLoader # Настройка Jinja2 д�
 # --- Модули проекта ---
 from config import STATIC_DIR, TEMPLATES_DIR, CACHE_TTL_HOUR, CACHE_TTL_DAY, CACHE_TTL_NO_EXPIRY
 from db import init_db_pool, close_db_pool, init_redis_pool, close_redis_pool
+from helpers import get_cache, set_cache
 
 
 # --- Жизненный цикл приложения FastAPI
@@ -141,15 +142,9 @@ async def show_lang_page(request: Request, lang: str):
 
         # Пробуем сначала получить кешированные данные из Redis по ключу
         # (если убрать, будем постоянно читать из БД)
-        cached_skills = await redis_pool.get(cache_key)
-        # Если кеш есть
-        if cached_skills:
-            # Логируем, что используются кэшированные данные из Redis
-            logging.info("Возвращаем данные из кеша")
-            # Если кэш найден — десериализуем JSON в Python-объект (список или словарь)
-            skills = json.loads(cached_skills)
+        skills = await get_cache(redis_pool, cache_key)
 
-        else:
+        if not skills:
             # Если в кэше нет — читаем из базы последние свежие данные для языка
             skill_row = await conn.fetchrow(
                 f"SELECT {row['code']} FROM hot_skills ORDER BY date DESC LIMIT 1"
@@ -161,7 +156,7 @@ async def show_lang_page(request: Request, lang: str):
                 skills = json.loads(skill_row[row["code"]])
 
                 # Кэшируем полученные данные в Redis на 24 часа (данные обновляются раз в день)
-                await redis_pool.set(cache_key, json.dumps(skills), ex=CACHE_TTL_DAY)
+                await set_cache(redis_pool, cache_key, skills, expire=CACHE_TTL_DAY)
             else:
                 # Если данных нет — оставляем пустым,
                 # чтобы не сломать шаблон и корректно обработать отсутствие данных
@@ -189,12 +184,12 @@ async def get_salaries():
     redis_pool = app.state.redis_pool
 
     # Пробуем сначала получить кешированные данные из Redis по ключу "salaries"
-    cached = await redis_pool.get("salaries")
+    cached_salaries = await get_cache(redis_pool, "salaries")
     # Если кеш есть
-    if cached:
+    if cached_salaries:
         # Логируем, что используются кэшированные данные из Redis
         logging.info("Возвращаем данные из кеша")
-        return JSONResponse(content=json.loads(cached)) # Отдаём кеш в виде JSON
+        return JSONResponse(content=cached_salaries) # Отдаём кеш в виде JSON
 
     # Если кеша нет
     try:
@@ -224,7 +219,7 @@ async def get_salaries():
     salaries_last_row_dict.pop('date', None)
 
     # Сохраняем результат в Redis на 60 минут (ex=3600 секунд)
-    await redis_pool.set("salaries", json.dumps(salaries_last_row_dict), ex=CACHE_TTL_HOUR)
+    await set_cache(redis_pool, "salaries", salaries_last_row_dict, expire=CACHE_TTL_HOUR)
 
     # Возвращаем результат в виде JSON
     return JSONResponse(content=salaries_last_row_dict)
@@ -244,12 +239,12 @@ async def get_languages():
 
     # Пробуем сначала получить кешированные данные из Redis по ключу "languages"
     # (иначе всегда будем дергать БД)
-    cached = await redis_pool.get("languages")
+    cached_languages = await get_cache(redis_pool, "languages")
     # Если кеш есть
-    if cached:
+    if cached_languages:
         # Логируем, что используются кэшированные данные из Redis
         logging.info("Возвращаем список языков из кеша")
-        return JSONResponse(content=json.loads(cached))  # Отдаём кеш в виде JSON
+        return JSONResponse(content=cached_languages)  # Отдаём кеш в виде JSON
 
     # Если нет — берём из загруженного списка
     languages = app.state.languages
@@ -257,7 +252,7 @@ async def get_languages():
     # Сохраняем результат в кеш Redis бессрочно, языки не часто обновляются
     # (иначе каждый запрос будет идти в БД)
     # (если я добавлю новые языки, я перезапущу руками)
-    await redis_pool.set("languages", json.dumps(languages), ex=CACHE_TTL_NO_EXPIRY)
+    await set_cache(redis_pool, "languages", languages, expire=CACHE_TTL_NO_EXPIRY)
 
     # Возвращаем данные в виде JSON
     return JSONResponse(content=languages)
@@ -310,13 +305,13 @@ async def get_vacancy_statistics(query: str = None):
 
     # Пробуем сначала получить кешированные данные из Redis по ключу "vacancy-statistics"
     cache_key = f"vacancy-statistics:{query or 'all'}"
-    cached_data = await redis_pool.get(cache_key)
+    cached_statistics = await get_cache(redis_pool, cache_key)
 
     # Если кеш есть
-    if cached_data:
+    if cached_statistics:
         # Логируем, что используются кэшированные данные из Redis
         logging.info("Возвращаем данные из кеша")
-        return JSONResponse(content=json.loads(cached_data))  # Отдаём кеш в виде JSON
+        return JSONResponse(content=cached_statistics)  # Отдаём кеш в виде JSON
 
 
     # Если кеша нет
@@ -367,7 +362,7 @@ async def get_vacancy_statistics(query: str = None):
 
         # --- Кешируем сформированный результат в Redis на 1 час (3600 сек) ---
         # Сохраняем результат для быстрого доступа, иначе каждый запрос будет грузить БД
-        await redis_pool.set(cache_key, json.dumps(result), ex=CACHE_TTL_HOUR)
+        await set_cache(redis_pool, cache_key, result, expire=CACHE_TTL_HOUR)
 
         # --- Возвращаем ответ клиенту ---
         # Отдаем собранные данные в JSON формате, иначе клиент не получит ответ
