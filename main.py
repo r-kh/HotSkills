@@ -7,9 +7,10 @@ FastAPI-приложение для отображения информации 
 - Инициализацию и настройку FastAPI с асинхронным жизненным циклом.
 - Подключение к PostgreSQL через asyncpg и к Redis для кэширования.
 - Подключение статических файлов и шаблонов Jinja2 для фронтенда.
-- REST API эндпоинты:
+- Основные HTML-страницы:
     - "/" — главная страница (index.html)
     - "/{lang}" — страница конкретного языка программирования (lang.html)
+- REST API эндпоинты подключаются через `api_router` (все маршруты находятся в папке api) :
     - "/api/salaries" — данные по зарплатам (JSON)
     - "/api/languages" — список языков программирования (JSON)
     - "/api/vacancy-statistics" — статистика вакансий по языкам и профессиям (JSON)
@@ -29,21 +30,19 @@ FastAPI-приложение для отображения информации 
 
 # --- Стандартные библиотеки ---
 import json                                      # Сериализация
-import logging                                   # Отслеживание работы/диагностика проблем
 from contextlib import asynccontextmanager       # для запуска/завершения FastAPI
 
 # --- Сторонние библиотеки ---
-import asyncpg                                   # Работа с PostgreSQL (async)
 import uvicorn                                   # Сервер ASGI(Asynhronus Server Gateway Interface)
 from fastapi import FastAPI, Request             # FastAPI и Request для Jinja
 from fastapi.responses import HTMLResponse       # Ответы в формате HTML-страниц
-from fastapi.responses import JSONResponse       # Ответы в формате JSON (для API)
 from fastapi.staticfiles import StaticFiles      # Подключение /static папки
 from fastapi.templating import Jinja2Templates   # Генератор HTML-страниц с динамическими данными
 from jinja2 import Environment, FileSystemLoader # Настройка Jinja2 для рендера HTML-шаблонов
 
 # --- Модули проекта ---
-from config import STATIC_DIR, TEMPLATES_DIR, CACHE_TTL_HOUR, CACHE_TTL_DAY, CACHE_TTL_NO_EXPIRY
+from api import router as api_router
+from config import STATIC_DIR, TEMPLATES_DIR, CACHE_TTL_DAY
 from db import init_db_pool, close_db_pool, init_redis_pool, close_redis_pool
 from helpers import get_cache, set_cache
 
@@ -89,6 +88,8 @@ async def lifespan(application: FastAPI):
 # --- Создаем экземпляр приложения (пока без доп.параметров title, description, version...)
 app = FastAPI(lifespan=lifespan)
 
+# Подключаем маршруты API из папки api (/api/salaries, /api/languages, /api/vacancy-statistics ...)
+app.include_router(api_router)
 
 # --- Подключаем статические файлы (/static) и шаблоны (HTML) в FastAPI-приложение ---
 
@@ -171,210 +172,6 @@ async def show_lang_page(request: Request, lang: str):
         "name"   : row["name"],  # для правильного отображения языка на страницах
         "skills" : skills        # навыки и их частота упоминаний (в пилюлях на странице языка)
     })
-
-
-# --- API: данные по зарплатам ---
-@app.get("/api/salaries")
-# Обработчик GET-запроса по маршруту /api/salaries
-async def get_salaries():
-    """Возвращает JSON с последними данными по зарплатам."""
-
-    # Получаем доступ к пулам соединений с БД и Redis
-    db_pool    = app.state.db_pool
-    redis_pool = app.state.redis_pool
-
-    # Пробуем сначала получить кешированные данные из Redis по ключу "salaries"
-    cached_salaries = await get_cache(redis_pool, "salaries")
-    # Если кеш есть
-    if cached_salaries:
-        # Логируем, что используются кэшированные данные из Redis
-        logging.info("Возвращаем данные из кеша")
-        return JSONResponse(content=cached_salaries) # Отдаём кеш в виде JSON
-
-    # Если кеша нет
-    try:
-        # Получаем соединение с базой данных
-        async with db_pool.acquire() as conn:
-
-            # Достаём одну (последнюю по дате) запись с зарплатами (DESC/DESCENDING - по убыванию)
-            salaries_last_row = await conn.fetchrow(
-                "SELECT * FROM salaries ORDER BY date DESC LIMIT 1"
-            )
-
-    except asyncpg.exceptions.PostgresError as e:
-
-        # Логируем ошибку (иначе не узнаем о проблемах)
-        logging.error("Ошибка при запросе к базе данных: %s", e)
-
-        # Отправляем клиенту ошибку 500 (иначе клиент не узнает о проблеме)
-        return JSONResponse(status_code=500, content={"error": str(e)})
-
-
-    # salaries_last_row - это объект asyncpg.Record,
-    # нужно конвертировать в словарь чтобы потом получилось сериализовать в JSON
-    # (иначе упадёт с ошибкой)
-    salaries_last_row_dict = dict(salaries_last_row) if salaries_last_row else {}
-
-    # Удаляем поле date, (сейчас на фронте оно пока не нужно)
-    salaries_last_row_dict.pop('date', None)
-
-    # Сохраняем результат в Redis на 60 минут (ex=3600 секунд)
-    await set_cache(redis_pool, "salaries", salaries_last_row_dict, expire=CACHE_TTL_HOUR)
-
-    # Возвращаем результат в виде JSON
-    return JSONResponse(content=salaries_last_row_dict)
-
-
-# --- API: получение списка языков программирования ---
-@app.get("/api/languages")
-async def get_languages():
-    """
-    Возвращает JSON со списком языков программирования.
-    Пример ответа на фронт:
-    [{"code":"one_c","name":"1C","color":"#E31E24"},...]
-    """
-
-    # Получаем доступ к пулам соединений с Redis
-    redis_pool = app.state.redis_pool
-
-    # Пробуем сначала получить кешированные данные из Redis по ключу "languages"
-    # (иначе всегда будем дергать БД)
-    cached_languages = await get_cache(redis_pool, "languages")
-    # Если кеш есть
-    if cached_languages:
-        # Логируем, что используются кэшированные данные из Redis
-        logging.info("Возвращаем список языков из кеша")
-        return JSONResponse(content=cached_languages)  # Отдаём кеш в виде JSON
-
-    # Если нет — берём из загруженного списка
-    languages = app.state.languages
-
-    # Сохраняем результат в кеш Redis бессрочно, языки не часто обновляются
-    # (иначе каждый запрос будет идти в БД)
-    # (если я добавлю новые языки, я перезапущу руками)
-    await set_cache(redis_pool, "languages", languages, expire=CACHE_TTL_NO_EXPIRY)
-
-    # Возвращаем данные в виде JSON
-    return JSONResponse(content=languages)
-
-
-# --- API: данные по вакансиям ---
-@app.get("/api/vacancy-statistics", response_class=JSONResponse)
-@app.get("/api/vacancy-statistics/{query}", response_class=JSONResponse)
-async def get_vacancy_statistics(query: str = None):
-    """
-    Возвращает JSON со статистикой вакансий по языкам и профессиям.
-    Аргументы: query (str, optional): Конкретный язык или профессия для фильтрации.
-
-    Пример ответа на фронт:
-    {            "python":  {"daily": [["2025-05-22",          [1200,  1600]], ..],
-                            "hourly": [["2025-05-23 20:00:00", [1100,  1500]], ..]},
-     "software_developer":  {"daily": [["2025-05-22",                 14500 ], ..],
-                            "hourly": [["2025-05-23 20:00:00",        14700 ], ..}}
-    """
-
-    # Получаем доступ к пулам соединений с БД и Redis и список языков
-    db_pool    = app.state.db_pool
-    redis_pool = app.state.redis_pool
-    langs      = [lang["code"] for lang in app.state.languages]
-
-    # сбор данных по часам
-    async def fetch_hourly(conn, table, columns):
-        sql_query = f"""
-            SELECT date, {columns}
-            FROM {table}
-            WHERE date >= NOW() - INTERVAL '24 hours'
-            ORDER BY date ASC;
-        """
-        return await conn.fetch(sql_query)
-
-    # сбор данных по дням (берётся самая поздняя запись с каждого дня)
-    async def fetch_daily(conn, table, columns):
-        sql_query = f"""
-            SELECT date::date AS date, {columns}
-            FROM (
-                SELECT *,
-                       ROW_NUMBER() OVER (PARTITION BY date::date ORDER BY date DESC) AS rn
-                FROM {table}
-                WHERE date >= NOW() - INTERVAL '30 days'
-            ) sub
-            WHERE rn = 1
-            ORDER BY date;
-        """
-        return await conn.fetch(sql_query)
-
-    # Пробуем сначала получить кешированные данные из Redis по ключу "vacancy-statistics"
-    cache_key = f"vacancy-statistics:{query or 'all'}"
-    cached_statistics = await get_cache(redis_pool, cache_key)
-
-    # Если кеш есть
-    if cached_statistics:
-        # Логируем, что используются кэшированные данные из Redis
-        logging.info("Возвращаем данные из кеша")
-        return JSONResponse(content=cached_statistics)  # Отдаём кеш в виде JSON
-
-
-    # Если кеша нет
-    try:
-        # Получаем соединение с базой данных
-        async with db_pool.acquire() as conn:
-
-            # Создаём пустой словарь для хранения итоговой статистики
-            result = {}
-
-            # Функция для получения статистики из таблицы по указанным колонкам
-            async def get_stat(table, columns):
-
-                # Запрашиваем ежедневные и почасовые данные из базы по указанным колонкам
-                daily  = await fetch_daily (conn, table, ', '.join(columns))
-                hourly = await fetch_hourly(conn, table, ', '.join(columns))
-
-                # Создаём словарь для хранения статистики по каждой колонке
-                statistics = {}
-
-                # Проходим по каждой колонке (например, языку программирования или профессии)
-                for column in columns:
-                    # Если query задан и не совпадает с текущей колонкой, пропускаем её
-                    if query and query != column:
-                        continue
-
-                    # Заполняем статистику для выбранной колонки по дням и часам
-                    statistics[column] = {
-                        # Формируем список пар [дата, значение] для ежедневных данных
-                        "daily": [[str(row["date"]), row[column]] for row in daily],
-                        # Формируем список пар [дата, значение] для почасовых данных
-                        "hourly": [[str(row["date"]), row[column]] for row in hourly],
-                    }
-
-                # Возвращаем словарь со статистикой по всем нужным колонкам
-                return statistics
-
-            # Если query совпадает с одним из языков или не задан, собираем статистику по языкам
-            if query in langs or query is None:
-                # Добавляем статистику по языкам в общий результат
-                result.update(await get_stat("vacancies_statistics.languages", langs))
-
-            # Если query не задан или равен software_developer → статистика по software_developer
-            if query in ["software_developer", None]:
-                # Добавляем статистику по профессии в общий результат
-                result.update(
-                    await get_stat("vacancies_statistics.professions", ["software_developer"]))
-
-        # --- Кешируем сформированный результат в Redis на 1 час (3600 сек) ---
-        # Сохраняем результат для быстрого доступа, иначе каждый запрос будет грузить БД
-        await set_cache(redis_pool, cache_key, result, expire=CACHE_TTL_HOUR)
-
-        # --- Возвращаем ответ клиенту ---
-        # Отдаем собранные данные в JSON формате, иначе клиент не получит ответ
-        return JSONResponse(content=result)
-
-    except asyncpg.exceptions.PostgresError as e:
-
-        # Логируем ошибку (иначе не узнаем о проблемах)
-        logging.error("Ошибка при запросе к базе данных: %s", e)
-
-        # Отправляем клиенту ошибку 500 (иначе клиент не узнает о проблеме)
-        return JSONResponse(status_code=500, content={"error": str(e)})
 
 
 # --- Запуск при старте ---
