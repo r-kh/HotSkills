@@ -1,6 +1,13 @@
-import json
-import logging
+"""
+Вспомогательные функции для работы с кэшированием данных в Redis.
+"""
 
+# --- Стандартные библиотеки ---
+import json                             # Сериализация
+import logging                          # Отслеживание работы/диагностика проблем
+
+# --- Сторонние библиотеки ---
+from redis.exceptions import RedisError # для ловли ошибок Redis
 
 async def get_cache(redis_pool, key):
     """
@@ -9,7 +16,7 @@ async def get_cache(redis_pool, key):
     """
     cached = await redis_pool.get(key)
     if cached:
-        logging.info(f"Кэш найден по ключу: {key}")
+        logging.info("Кэш найден по ключу: %s", key)
         return json.loads(cached)
     return None
 
@@ -24,6 +31,6 @@ async def set_cache(redis_pool, key, value, expire=None):
     """
     try:
         await redis_pool.set(key, json.dumps(value), ex=expire)
-        logging.info(f"Кэш установлен по ключу: {key}, TTL={expire}")
-    except Exception as e:
-        logging.error(f"Ошибка при установке кэша в Redis: {e}")
+        logging.info("Кэш установлен по ключу: %s, TTL=%s", key, expire)
+    except RedisError as e:
+        logging.error("Ошибка при установке кэша в Redis: %s", e)
