@@ -18,8 +18,8 @@ DB_CONFIG = {
 REDIS_URL = os.getenv("REDIS_URL")
 
 # --- Пути к статическим файлам и шаблонам ---
-STATIC_DIR    = os.getenv("STATIC_DIR", "static")
-TEMPLATES_DIR = os.getenv("TEMPLATES_DIR", "templates")
+STATIC_DIR    = os.getenv("STATIC_DIR", "../static")
+TEMPLATES_DIR = os.getenv("TEMPLATES_DIR", "../templates")
 
 # --- Настройки кэширования (по умолчанию) ---
 CACHE_TTL_HOUR      = 3600  # 1 час

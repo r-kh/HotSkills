@@ -14,7 +14,7 @@ import asyncpg                          # Работа с PostgreSQL (async)
 import redis.asyncio as redis           # Кэширование часто запрашиваемых данных (async)
 
 # --- Модули проекта ---
-from config import DB_CONFIG, REDIS_URL
+from app.core.config import DB_CONFIG, REDIS_URL
 
 
 async def init_db_pool():

@@ -8,10 +8,10 @@ from fastapi.staticfiles import StaticFiles  # Подключение /static п
 import uvicorn  # Запуск сервера ASGI (Asynchronous Server Gateway Interface)
 
 # Модули проекта
-from api import router as api_router
-from config import STATIC_DIR
-from lifespan import lifespan
-from views import router as views_router
+from app.api import router as api_router
+from app.core.config import STATIC_DIR
+from app.core.lifespan import lifespan
+from app.web.pages import router as web_router
 
 
 # Инициализация приложения
@@ -19,10 +19,10 @@ app = FastAPI(lifespan=lifespan)
 
 # Подключаем маршруты
 app.include_router(api_router)  # API (/salaries, /languages, /vacancy-statistics ...)
-app.include_router(views_router)  # HTML-страницы (index.html, lang.html и др.)
+app.include_router(web_router)  # HTML-страницы (index.html, lang.html и др.)
 
 # Подключаем статические файлы (/static: CSS, JS, изображения)
-app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
+app.mount("static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
 # Запуск приложения напрямую (только при запуске python main.py)

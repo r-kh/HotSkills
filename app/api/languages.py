@@ -10,8 +10,8 @@ from fastapi import APIRouter, Request     # Маршрутизатор и об�
 from fastapi.responses import JSONResponse # Ответы в формате JSON (для API)
 
 # --- Модули проекта ---
-from config import CACHE_TTL_NO_EXPIRY
-from helpers import get_cache, set_cache
+from app.core.config import CACHE_TTL_NO_EXPIRY
+from app.core.helpers import get_cache, set_cache
 
 router = APIRouter()
 

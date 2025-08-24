@@ -1,5 +1,5 @@
 """
-views.py — маршруты для HTML-страниц (frontend-часть).
+pages.py — маршруты для HTML-страниц (frontend-часть).
 
 Содержит обработчики GET-запросов, которые возвращают сгенерированные Jinja2-шаблоны:
 - "/"       — главная страница (index.html)
@@ -12,8 +12,8 @@ from fastapi.responses import HTMLResponse       # Ответы в формат�
 from fastapi.templating import Jinja2Templates   # Генератор HTML-страниц с динамическими данными
 from jinja2 import Environment, FileSystemLoader # Настройка Jinja2 для рендера HTML-шаблонов
 
-from config import TEMPLATES_DIR, CACHE_TTL_DAY
-from helpers import get_cache, set_cache
+from app.core.config import TEMPLATES_DIR, CACHE_TTL_DAY
+from app.core.helpers import get_cache, set_cache
 
 router = APIRouter()
 
