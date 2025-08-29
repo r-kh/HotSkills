@@ -22,7 +22,7 @@ app.include_router(api_router)  # API (/salaries, /languages, /vacancy-statistic
 app.include_router(web_router)  # HTML-страницы (index.html, lang.html и др.)
 
 # Подключаем статические файлы (/static: CSS, JS, изображения)
-app.mount("static", StaticFiles(directory=STATIC_DIR), name="static")
+app.mount("/app/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
 # Запуск приложения напрямую (только при запуске python main.py)

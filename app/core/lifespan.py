@@ -13,7 +13,7 @@ from contextlib import asynccontextmanager  # для запуска/заверш
 from fastapi import FastAPI
 
 # Модули проекта
-from db import init_db_pool, close_db_pool, init_redis_pool, close_redis_pool
+from app.core.db import init_db_pool, close_db_pool, init_redis_pool, close_redis_pool
 
 
 async def load_languages(db_pool):

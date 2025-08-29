@@ -117,7 +117,7 @@ function renderTableData() {
         // --- Блок с логотипом и названием языка ---
         const tdLogo = document.createElement("td");// Создаём <td> — 1-ю ячейку таблицы
         const img = document.createElement("img");     // Создаём <img> — логотип языка
-        img.src = `/static/logos/${item.code}.webp`;                            // Указываем путь к логотипу по коду языка (иначе не будет изображения)
+        img.src = `/app/static/logos/${item.code}.webp`;                        // Указываем путь к логотипу по коду языка (иначе не будет изображения)
         img.alt = item.name;                                                    // Добавляем alt-текст для картинки (важно для доступности и SEO)
         tdLogo.appendChild(img);                                                // Вставляем логотип в ячейку
         tdLogo.appendChild(document.createTextNode(item.name));                 // Добавляем текст (название языка) рядом с логотипом

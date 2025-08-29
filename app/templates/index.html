@@ -14,7 +14,7 @@
     loadLanguagesIfNeeded().then(() =>
         getLanguageCodes()?.forEach(code =>
             document.head.insertAdjacentHTML("beforeend",
-                `<link rel="preload" as="image" href="/static/logos/${code}.webp">`
+                `<link rel="preload" as="image" href="/app/static/logos/${code}.webp">`
             )
         )
     ).catch(e => console.error("Ошибка при прелоаде иконок:", e));
@@ -117,7 +117,7 @@
 <!--<link rel="preload" href="/static/libs/plotly-basic-latest.min.js" as="script">-->
 <!--<script defer src="/static/libs/plotly-basic-latest.min.js"></script>-->
 <!-- Подключение JavaScript-файлов (интерактивные элементы, графики, таблицы и т.д.) -->
-<script type="module" src="/app/staticipts.js" defer></script>
+<script type="module" src="/app/static/js/scripts.js" defer></script>
 
 {% endblock %}
 <!-- Закрытие блока контента. -->
