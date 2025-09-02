@@ -1,4 +1,11 @@
-import { loadVacanciesIfNeeded, getVacanciesData, getLanguagesData, loadLanguagesIfNeeded } from './api.js';
+import {
+    loadVacanciesIfNeeded,
+    getVacanciesData,
+    getLanguagesData,
+    loadLanguagesIfNeeded,
+    loadResumesIfNeeded,
+    getResumesData
+} from './api.js';
 
 
 
@@ -208,6 +215,7 @@ export function renderChart({
     defaultView,            // стартовое представление (daily или hourly)
     showLegend,             // отображать ли легенду для графика
     height,                 // кастомная высота графика
+    yAxisTitle,             // название оси Y
     region='russia'  // Москва/Россия (по умолчанию Россия)
 }) {
 
@@ -228,7 +236,8 @@ export function renderChart({
             ...baseLayout,
             showlegend: showLegend,
             dragmode: false,
-            ...(height ? {height} : {}) // если height передан, используем его
+            ...(height ? {height} : {}), // если height передан, используем его
+            ...(yAxisTitle ? {yaxis: {...baseLayout.yaxis, title: {...baseLayout.yaxis.title, text: yAxisTitle}}} : {})
         };
 
         // // Формируем конфигурацию графика:
@@ -268,10 +277,21 @@ export const initCharts = async () => {
     try {
 
         await loadLanguagesIfNeeded();
+        await loadResumesIfNeeded();
         await loadVacanciesIfNeeded();
 
         renderChart({
-            htmlContainerId         : 'chart_software_developer',
+            htmlContainerId         : 'chart_software_developer_resumes',
+            vacancyStats            : getResumesData(),
+            chartEntities           : [{code: 'resumes', name: 'Резюме', color: 'steelblue'}],
+            switchable              : true,
+            defaultView             : 'daily',
+            showLegend              : false,
+            yAxisTitle              : 'Количество активных резюме'
+        });
+
+        renderChart({
+            htmlContainerId         : 'chart_software_developer_vacancies',
             vacancyStats            : {software_developer: getVacanciesData()['software_developer']},
             chartEntities           : [{code: 'software_developer', name: 'Разработчик ПО', color: 'crimson'}],
             switchable              : true,

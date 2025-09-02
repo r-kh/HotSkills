@@ -1,6 +1,7 @@
 // === Кэш для данных по зарплатам и вакансиям (чтобы не создавать избыточных запросов (fetch), например при переключении регионов или дневных/почасовых показателей) === //
 let cachedSalariesData            = null;
 let cachedVacanciesStatisticsData = null;
+let cachedResumesStatisticsData   = null;
 let cachedLanguagesData           = null;
 let cachedLanguageCodes           = null;
 let cachedLanguageNames           = null;
@@ -8,6 +9,7 @@ let cachedLanguageNames           = null;
 // === Промисы загрузки (чтобы избежать одних и тех же дублирующих одинаковых параллельных запросов к api) === //
 let salariesLoadingPromise  = null;
 let vacanciesLoadingPromise = null;
+let resumesLoadingPromise   = null;
 let languagesLoadingPromise = null;
 
 
@@ -47,6 +49,21 @@ export async function loadVacanciesIfNeeded() {
     return vacanciesLoadingPromise;
 }
 
+// === Загрузка резюме ===
+export async function loadResumesIfNeeded() {
+    if (cachedResumesStatisticsData) return;
+    if (resumesLoadingPromise) return resumesLoadingPromise;
+
+    resumesLoadingPromise = fetch("/api/resume-statistics")
+        .then(res => res.json())
+        .then(json => {
+            cachedResumesStatisticsData = json;
+            resumesLoadingPromise = null; // сброс
+        });
+
+    return resumesLoadingPromise;
+}
+
 // === Загрузка языков ===
 export async function loadLanguagesIfNeeded() {
     if (cachedLanguagesData) return;
@@ -80,6 +97,11 @@ export function getSalariesData() {
 // Возвращает кэшированные данные по вакансиям
 export function getVacanciesData() {
     return cachedVacanciesStatisticsData;
+}
+
+// Возвращает кэшированные данные по резюме
+export function getResumesData() {
+    return cachedResumesStatisticsData;
 }
 
 export function getLanguagesData() {
