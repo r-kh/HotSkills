@@ -48,7 +48,7 @@ async def get_resume_statistics(request: Request):
             SELECT date::date AS date, "software_developer"
             FROM (
                 SELECT *,
-                       ROW_NUMBER() OVER (PARTITION BY date::date ORDER BY date DESC) AS rn
+                       ROW_NUMBER() OVER (PARTITION BY date::date ORDER BY "software_developer" DESC) AS rn
                 FROM resumes
                 WHERE date >= NOW() - INTERVAL '30 days'
             ) sub
