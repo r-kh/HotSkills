@@ -22,6 +22,12 @@ function renderTable() {
 
         const tr = document.createElement("tr");
 
+        // Переход на страницу вакансии HH.ru в новой вкладке
+        tr.style.cursor = "pointer";
+        tr.addEventListener("click", () => {
+            window.open(`https://hh.ru/vacancy/${vacancy.id}`, "_blank");
+        });
+
         tr.innerHTML = `
             <td>${vacancy.name}</td>
             <td></td>
