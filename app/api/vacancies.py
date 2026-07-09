@@ -51,9 +51,9 @@ async def get_vacancies(request: Request):
         async with db_pool.acquire() as conn:
 
             # получаем данные
-            rows = await conn.fetch("""SELECT id, name FROM vacancies;""")
+            rows = await conn.fetch("""SELECT id, name, responses FROM vacancies;""")
 
-            result = { "vacancies": [{"id": row["id"], "name": row["name"]} for row in rows] }
+            result = { "vacancies": [{"id": row["id"], "name": row["name"], "responses": row["responses"]} for row in rows] }
 
         # кэшируем на 1 час
         await set_cache(redis_pool, cache_key, result, expire=CACHE_TTL_HOUR)

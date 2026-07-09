@@ -44,10 +44,58 @@
 </div>
 
 
+<!-- Блок вакансий -->
+
+<!-- Заголовок для таблицы с вакансиями по языкам программирования. Если удалить, не будет отображаться заголовок. -->
+<div class="chart-title">
+    Вакансии связанные с языком программирования {{ name }} (на <span id="current-date"></span>)<br>
+    <span class="title-sub">(по специализации "Программист, разработчик")</span>
+</div>
+
+
+<!-- Контейнер и таблица для отображения вакансий для языка программирования. -->
+<div class="salary-table-wrapper">
+
+    <div class="tabs">
+        <div class="tab active" data-value="moscow">Москва</div>
+        <div class="tab" data-value="russia">Россия</div>
+    </div>
+
+    <table class="salary-table">
+        <thead>
+        <tr>
+            <th data-sortable>Название вакансии</th>
+            <th data-sortable>Опубликована</th>
+            <th data-sortable>Откликов</th>
+            <th data-sortable>Оформление</th>
+            <th data-sortable>Оклад</th>
+        </tr>
+        </thead>
+        <tbody>
+            <!-- Здесь контент отрабатывает table.js (логотипы, названия языков, вакансии, зарплаты) -->
+        </tbody>
+    </table>
+</div>
+
+
+<!-- Центрирующий страничный контейнер ограничивающий ширину (чтобы содержимое при ультра широких экранах не съехало в бок) -->
+<div class="container-page">
+
+    <!-- Пруфлинк -->
+    <p class="chart-source">
+        Таблица в разработке...
+    </p>
+</div>
+
+
+
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const now = new Date();
+        document.getElementById('current-date').textContent = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
         document.getElementById('current-datetime').textContent = now.toLocaleString();
     });
 </script>
+<script type="module" src="/app/static/js/vacancies.js"></script>
 {% endblock %}

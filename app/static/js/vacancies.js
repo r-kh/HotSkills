@@ -31,8 +31,7 @@ function renderTable() {
         tr.innerHTML = `
             <td>${vacancy.name}</td>
             <td></td>
-            <td></td>
-            <td></td>
+            <td>${vacancy.responses}</td>
             <td></td>
             <td></td>
         `;
