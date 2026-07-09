@@ -2,7 +2,7 @@
 import {initCharts}      from './charts.js';
 import {initSalaryTable} from './table.js';
 
-// Как только брауер прочёл HTML (инструкцию) и построил DOM (каркас) - можно слушать элменты DOM (Document Object Model) //
+// Как только брауер прочёл HTML (инструкцию) и построил DOM (каркас) - можно слушать элементы DOM (Document Object Model) //
 document.addEventListener('DOMContentLoaded', function () {
     /* Этот код выполнится, когда HTML будет загружен и готов к работе
        Если удалить - весь скрипт может выполниться до загрузки DOM-элементов и сломаться. */
