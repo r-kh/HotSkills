@@ -1,16 +1,18 @@
 // === Кэш для данных по зарплатам и вакансиям (чтобы не создавать избыточных запросов (fetch), например при переключении регионов или дневных/почасовых показателей) === //
-let cachedSalariesData            = null;
-let cachedVacanciesStatisticsData = null;
-let cachedResumesStatisticsData   = null;
-let cachedLanguagesData           = null;
-let cachedLanguageCodes           = null;
-let cachedLanguageNames           = null;
+let cachedSalariesData          = null;
+let cachedVacanciesData         = null;
+let cachedVacancyStatisticsData = null;
+let cachedResumeStatisticsData  = null;
+let cachedLanguagesData         = null;
+let cachedLanguageCodes         = null;
+let cachedLanguageNames         = null;
 
 // === Промисы загрузки (чтобы избежать одних и тех же дублирующих одинаковых параллельных запросов к api) === //
-let salariesLoadingPromise  = null;
-let vacanciesLoadingPromise = null;
-let resumesLoadingPromise   = null;
-let languagesLoadingPromise = null;
+let salariesLoadingPromise          = null;
+let vacanciesLoadingPromise         = null;
+let vacancyStatisticsLoadingPromise = null;
+let resumeStatisticsLoadingPromise  = null;
+let languagesLoadingPromise         = null;
 
 
 /**
@@ -34,34 +36,52 @@ export async function loadSalariesIfNeeded() {
     return salariesLoadingPromise;
 }
 
+
 // === Загрузка вакансий ===
 export async function loadVacanciesIfNeeded() {
-    if (cachedVacanciesStatisticsData) return;
+    if (cachedVacanciesData) return;
     if (vacanciesLoadingPromise) return vacanciesLoadingPromise;
 
-    vacanciesLoadingPromise = fetch("/api/vacancy-statistics")
+    vacanciesLoadingPromise = fetch("/api/vacancies")
         .then(res => res.json())
         .then(json => {
-            cachedVacanciesStatisticsData = json;
+            cachedVacanciesData = json;
             vacanciesLoadingPromise = null; // сброс
         });
 
     return vacanciesLoadingPromise;
 }
 
-// === Загрузка резюме ===
-export async function loadResumesIfNeeded() {
-    if (cachedResumesStatisticsData) return;
-    if (resumesLoadingPromise) return resumesLoadingPromise;
 
-    resumesLoadingPromise = fetch("/api/resume-statistics")
+// === Загрузка статистики вакансий ===
+export async function loadVacancyStatisticsIfNeeded() {
+    if (cachedVacancyStatisticsData) return;
+    if (vacancyStatisticsLoadingPromise) return vacancyStatisticsLoadingPromise;
+
+    vacancyStatisticsLoadingPromise = fetch("/api/vacancy-statistics")
         .then(res => res.json())
         .then(json => {
-            cachedResumesStatisticsData = json;
-            resumesLoadingPromise = null; // сброс
+            cachedVacancyStatisticsData = json;
+            vacancyStatisticsLoadingPromise = null; // сброс
         });
 
-    return resumesLoadingPromise;
+    return vacancyStatisticsLoadingPromise;
+}
+
+
+// === Загрузка статистики резюме ===
+export async function loadResumeStatisticsIfNeeded() {
+    if (cachedResumeStatisticsData) return;
+    if (resumeStatisticsLoadingPromise) return resumeStatisticsLoadingPromise;
+
+    resumeStatisticsLoadingPromise = fetch("/api/resume-statistics")
+        .then(res => res.json())
+        .then(json => {
+            cachedResumeStatisticsData = json;
+            resumeStatisticsLoadingPromise = null; // сброс
+        });
+
+    return resumeStatisticsLoadingPromise;
 }
 
 // === Загрузка языков ===
@@ -96,12 +116,17 @@ export function getSalariesData() {
 
 // Возвращает кэшированные данные по вакансиям
 export function getVacanciesData() {
-    return cachedVacanciesStatisticsData;
+    return cachedVacanciesData;
 }
 
-// Возвращает кэшированные данные по резюме
-export function getResumesData() {
-    return cachedResumesStatisticsData;
+// Возвращает кэшированные данные по статистике вакансий
+export function getVacancyStatisticsData() {
+    return cachedVacancyStatisticsData;
+}
+
+// Возвращает кэшированные данные по статистике резюме
+export function getResumesStatisticsData() {
+    return cachedResumeStatisticsData;
 }
 
 export function getLanguagesData() {

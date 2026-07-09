@@ -1,4 +1,4 @@
-import { loadVacanciesIfNeeded, loadSalariesIfNeeded, getLanguagesData, getVacanciesData, getSalariesData } from './api.js';
+import { loadVacancyStatisticsIfNeeded, loadSalariesIfNeeded, getLanguagesData, getVacancyStatisticsData, getSalariesData } from './api.js';
 
 
 let currentRegion = 'moscow';  // Текущий выбранный регион (по умолчанию Москва)
@@ -49,7 +49,7 @@ async function activateTab(tab) {
 async function updateSalaryTable(region) {
     try {
         // загружаем данные при необходимости
-        await Promise.all([loadVacanciesIfNeeded(), loadSalariesIfNeeded()]);
+        await Promise.all([loadVacancyStatisticsIfNeeded(), loadSalariesIfNeeded()]);
         clearTableBody();       // Очищаем таблицу
         addRowsToTable(region); // Заполняем таблицу строками по региону
         addTableSorting();      // Подключаем сортировку
@@ -72,7 +72,7 @@ function clearTableBody() {
 function addRowsToTable(region) {
 
     const languages = getLanguagesData(); // список языков программирования -> массив объектов: { code, name }
-    const vacancies = getVacanciesData(); // кэшированные данные по вакансиям -> объекты: code -> { daily, hourly }
+    const vacancies = getVacancyStatisticsData(); // кэшированные данные по вакансиям -> объекты: code -> { daily, hourly }
     const salaries  = getSalariesData();  // кэшированные данные по зарплатам -> объекты: code -> { без опыта, 1-3года, 3-6лет, 6+ }
 
     // Собираем данные в строки по каждому языку в единый массив tableData для дальнейшей отрисовки

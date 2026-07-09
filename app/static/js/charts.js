@@ -1,10 +1,10 @@
 import {
-    loadVacanciesIfNeeded,
-    getVacanciesData,
+    loadVacancyStatisticsIfNeeded,
+    getVacancyStatisticsData,
     getLanguagesData,
     loadLanguagesIfNeeded,
-    loadResumesIfNeeded,
-    getResumesData
+    loadResumeStatisticsIfNeeded,
+    getResumesStatisticsData
 } from './api.js';
 
 
@@ -277,12 +277,12 @@ export const initCharts = async () => {
     try {
 
         await loadLanguagesIfNeeded();
-        await loadResumesIfNeeded();
-        await loadVacanciesIfNeeded();
+        await loadResumeStatisticsIfNeeded();
+        await loadVacancyStatisticsIfNeeded();
 
         renderChart({
             htmlContainerId         : 'chart_software_developer_resumes',
-            vacancyStats            : getResumesData(),
+            vacancyStats            : getResumesStatisticsData(),
             chartEntities           : [{code: 'resumes', name: 'Резюме', color: 'steelblue'}],
             switchable              : true,
             defaultView             : 'daily',
@@ -292,7 +292,7 @@ export const initCharts = async () => {
 
         renderChart({
             htmlContainerId         : 'chart_software_developer_vacancies',
-            vacancyStats            : {software_developer: getVacanciesData()['software_developer']},
+            vacancyStats            : {software_developer: getVacancyStatisticsData()['software_developer']},
             chartEntities           : [{code: 'software_developer', name: 'Разработчик ПО', color: 'crimson'}],
             switchable              : true,
             defaultView             : 'daily',
@@ -301,7 +301,7 @@ export const initCharts = async () => {
 
         renderChart({
             htmlContainerId         : 'chart_all_languages',
-            vacancyStats            : getVacanciesData(), // получаем кэшированные данные по вакансиям,
+            vacancyStats            : getVacancyStatisticsData(), // получаем кэшированные данные по вакансиям,
             chartEntities           : getLanguagesData(),
             switchable              : false,
             defaultView             : 'daily',
