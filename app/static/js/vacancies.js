@@ -4,7 +4,10 @@ import {
 } from "./api.js";
 
 let tableData = [];
-let ascending = false;
+let sortState = {
+    column: null,
+    ascending: false
+};
 
 document.addEventListener("DOMContentLoaded", async () => {
 
@@ -47,17 +50,35 @@ function renderTable() {
 
 function addSorting() {
 
-    // 3-я колонка ("Откликов")
-    const th = document.querySelectorAll(".salary-table th")[2];
+    const headers = document.querySelectorAll(".salary-table th");
 
-    th.style.cursor = "pointer";
+    // 2-я колонка ("Опубликована")
+    headers[1].style.cursor = "pointer";
+    headers[1].addEventListener("click", () => {
 
-    th.addEventListener("click", () => {
-
-        ascending = !ascending;
+        sortState.ascending =
+            sortState.column === 1 ? !sortState.ascending : false;
+        sortState.column = 1;
 
         tableData.sort((a, b) =>
-            ascending
+            sortState.ascending
+                ? Date.parse(a.date) - Date.parse(b.date)
+                : Date.parse(b.date) - Date.parse(a.date)
+        );
+
+        renderTable();
+    });
+
+    // 3-я колонка ("Откликов")
+    headers[2].style.cursor = "pointer";
+    headers[2].addEventListener("click", () => {
+
+        sortState.ascending =
+            sortState.column === 2 ? !sortState.ascending : false;
+        sortState.column = 2;
+
+        tableData.sort((a, b) =>
+            sortState.ascending
                 ? a.responses - b.responses
                 : b.responses - a.responses
         );
