@@ -37,6 +37,7 @@ function renderTable() {
 
         tr.innerHTML = `
             <td>${vacancy.name}</td>
+            <td></td>
             <td>${vacancy.date}</td>
             <td>${vacancy.responses}</td>
             <td></td>
@@ -53,12 +54,12 @@ function addSorting() {
     const headers = document.querySelectorAll(".salary-table th");
 
     // 2-я колонка ("Опубликована")
-    headers[1].style.cursor = "pointer";
-    headers[1].addEventListener("click", () => {
+    headers[2].style.cursor = "pointer";
+    headers[2].addEventListener("click", () => {
 
         sortState.ascending =
-            sortState.column === 1 ? !sortState.ascending : false;
-        sortState.column = 1;
+            sortState.column === 2 ? !sortState.ascending : false;
+        sortState.column = 2;
 
         tableData.sort((a, b) =>
             sortState.ascending
@@ -70,12 +71,12 @@ function addSorting() {
     });
 
     // 3-я колонка ("Откликов")
-    headers[2].style.cursor = "pointer";
-    headers[2].addEventListener("click", () => {
+    headers[3].style.cursor = "pointer";
+    headers[3].addEventListener("click", () => {
 
         sortState.ascending =
-            sortState.column === 2 ? !sortState.ascending : false;
-        sortState.column = 2;
+            sortState.column === 3 ? !sortState.ascending : false;
+        sortState.column = 3;
 
         tableData.sort((a, b) =>
             sortState.ascending
