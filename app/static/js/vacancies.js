@@ -3,11 +3,17 @@ import {
     getVacanciesData
 } from "./api.js";
 
+let tableData = [];
+let ascending = false;
+
 document.addEventListener("DOMContentLoaded", async () => {
 
     await loadVacanciesIfNeeded();
 
+    tableData = [...getVacanciesData().vacancies];
+
     renderTable();
+    addSorting();
 });
 
 function renderTable() {
@@ -16,9 +22,7 @@ function renderTable() {
 
     tbody.innerHTML = "";
 
-    const data = getVacanciesData();
-
-    data.vacancies.forEach(vacancy => {
+    tableData.forEach(vacancy => {
 
         const tr = document.createElement("tr");
 
@@ -30,13 +34,35 @@ function renderTable() {
 
         tr.innerHTML = `
             <td>${vacancy.name}</td>
-            <td></td>
+            <td>${vacancy.date}</td>
             <td>${vacancy.responses}</td>
             <td></td>
             <td></td>
         `;
 
         tbody.appendChild(tr);
+    });
+
+}
+
+function addSorting() {
+
+    // 3-я колонка ("Откликов")
+    const th = document.querySelectorAll(".salary-table th")[2];
+
+    th.style.cursor = "pointer";
+
+    th.addEventListener("click", () => {
+
+        ascending = !ascending;
+
+        tableData.sort((a, b) =>
+            ascending
+                ? a.responses - b.responses
+                : b.responses - a.responses
+        );
+
+        renderTable();
     });
 
 }
