@@ -11,7 +11,7 @@ from fastapi.responses import JSONResponse   # Ответы в формате JS
 from asyncpg.exceptions import PostgresError
 
 # --- Модули проекта ---
-from app.core.config import CACHE_TTL_HOUR
+from app.core.config import CACHE_TTL_30_MIN
 from app.core.helpers import get_cache, set_cache
 
 
@@ -56,7 +56,7 @@ async def get_vacancies(request: Request):
             result = { "vacancies": [{"id": row["id"], "name": row["name"], "responses": row["responses"]} for row in rows] }
 
         # кэшируем на 1 час
-        await set_cache(redis_pool, cache_key, result, expire=CACHE_TTL_HOUR)
+        await set_cache(redis_pool, cache_key, result, expire=CACHE_TTL_30_MIN)
 
         return JSONResponse(content=result)
 
