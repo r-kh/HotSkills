@@ -26,11 +26,12 @@ async def get_vacancies(request: Request):
 
     Пример ответа на фронт:
     {
-        "vacancies": {
-            { "id" : "135021315", "name" : "Инженер-разработчик систем искусственного интеллекта" },
-            { "id" : "135021316", "name" : "Python Backend Developer" },
-            ...
-        }
+        "vacancies": [
+            {"id": 135021315, "name": "Python",    "date": "2026-07-08", "responses": 351, "salary": [1000, null] },
+            {"id": 135021315, "name": "FastAPI",   "date": "2026-07-08", "responses": 351, "salary": [1000, 2000] },
+            {"id": 135021316, "name": "Backend",   "date": "2026-07-07", "responses": 120, "salary": [null, 3000] },
+            {"id": 135021317, "name": "Developer", "date": "2026-07-06", "responses": 500, "salary": null },
+            ...]
     }
     """
 
@@ -51,9 +52,17 @@ async def get_vacancies(request: Request):
         async with db_pool.acquire() as conn:
 
             # получаем данные
-            rows = await conn.fetch("""SELECT id, name, date, responses FROM vacancies;""")
+            rows = await conn.fetch("""SELECT id, name, employer, date, responses, labor_contract, salary FROM vacancies;""")
 
-            result = { "vacancies": [{"id": row["id"], "name": row["name"], "date": row["date"].isoformat(), "responses": row["responses"]} for row in rows] }
+            result = {"vacancies": [{
+                        "id"             : row["id"],
+                        "name"           : row["name"],
+                        "Работодатель"   : row["employer"],
+                        "date"           : row["date"].isoformat(),
+                        "responses"      : row["responses"],
+                        "labor_contract" : row["labor_contract"],
+                        "salary"         : row["salary"]}
+                    for row in rows]}
 
         # кэшируем на 1 час
         await set_cache(redis_pool, cache_key, result, expire=CACHE_TTL_30_MIN)
