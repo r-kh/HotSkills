@@ -22,7 +22,7 @@ STATIC_DIR    = os.getenv("STATIC_DIR")
 TEMPLATES_DIR = os.getenv("TEMPLATES_DIR")
 
 # --- Настройки кэширования (по умолчанию) ---
-CACHE_TTL_30_MIN    = 1800  # 1 час
+CACHE_TTL_30_MIN    = 1800  # 30 мин
 CACHE_TTL_HOUR      = 3600  # 1 час
 CACHE_TTL_DAY       = 86400 # 24 часа
 CACHE_TTL_NO_EXPIRY = None  # бессрочно

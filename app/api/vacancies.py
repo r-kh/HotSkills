@@ -7,7 +7,6 @@ import logging
 
 # --- Сторонние библиотеки ---
 import re
-import copy
 from fastapi import APIRouter, Request       # Маршрутизатор и запросы к FastAPI
 from fastapi.responses import JSONResponse   # Ответы в формате JSON (для API)
 from asyncpg.exceptions import PostgresError
