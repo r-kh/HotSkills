@@ -107,8 +107,7 @@ async def get_vacancies(request: Request, search: str | None = None):
     вакансии = закэшированые_вакансии_с_description or вакансии_с_description
 
     def match_text(text: str, query: str) -> bool:
-        return re.search(rf"\b{re.escape(query)}\b", text.lower()) is not None
-
+        return re.search(rf"(?<!\w){re.escape(query)}(?!\w)", text.lower()) is not None
 
     вакансии_по_поиску_без_description = {
         "vacancies": [
