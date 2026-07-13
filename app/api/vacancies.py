@@ -27,10 +27,10 @@ async def get_vacancies(request: Request):
     Пример ответа на фронт:
     {
         "vacancies": [
-            {"id": 135021315, "name": "Python",    "date": "2026-07-08", "responses": 351, "salary": [1000, null] },
-            {"id": 135021315, "name": "FastAPI",   "date": "2026-07-08", "responses": 351, "salary": [1000, 2000] },
-            {"id": 135021316, "name": "Backend",   "date": "2026-07-07", "responses": 120, "salary": [null, 3000] },
-            {"id": 135021317, "name": "Developer", "date": "2026-07-06", "responses": 500, "salary": null },
+            {"id": 135021315, "name": "Python",    "date": "2026-07-08", "responses": 351, "salary": [1000, null], description: "..." },
+            {"id": 135021315, "name": "FastAPI",   "date": "2026-07-08", "responses": 351, "salary": [1000, 2000], description: "..." },
+            {"id": 135021316, "name": "Backend",   "date": "2026-07-07", "responses": 120, "salary": [null, 3000], description: "..." },
+            {"id": 135021317, "name": "Developer", "date": "2026-07-06", "responses": 500, "salary":         null, description: "..." },
             ...]
     }
     """
@@ -52,7 +52,7 @@ async def get_vacancies(request: Request):
         async with db_pool.acquire() as conn:
 
             # получаем данные
-            rows = await conn.fetch("""SELECT id, name, employer, date, responses, labor_contract, salary FROM vacancies;""")
+            rows = await conn.fetch("""SELECT id, name, employer, date, responses, labor_contract, salary, description FROM vacancies;""")
 
             result = {"vacancies": [{
                         "id"             : row["id"],
@@ -61,7 +61,9 @@ async def get_vacancies(request: Request):
                         "date"           : row["date"].isoformat(),
                         "responses"      : row["responses"],
                         "labor_contract" : row["labor_contract"],
-                        "salary"         : row["salary"]}
+                        "salary"         : row["salary"],
+                        "description"    : row["description"]
+            }
                     for row in rows]}
 
         # кэшируем на 1 час

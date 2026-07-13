@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Вакансии программистов / DevSkills.info{% endblock %}
+
+{% block content %}
+
+<div class="container">
+    <h1 class="lang-title">Вакансии программистов/разработчиков</h1>
+</div>
+
+<div class="chart-title">
+    Открытые вакансии по специализации «Программист, разработчик» (на <span id="current-date"></span>)<br>
+    <!-- Информирование о статистике с HH.RU на текущую дату/время -->
+    <span class="title-sub">(cтатистика по открытым данным с <strong>HH.RU</strong> на <span
+            id="current-datetime"></span>)</span>
+</div>
+
+<div class="salary-table-wrapper">
+
+    <div class="tabs">
+        <div class="tab active" data-value="moscow">Москва</div>
+        <div class="tab" data-value="russia">Россия</div>
+    </div>
+
+    <table class="salary-table">
+        <thead>
+            <tr>
+                <th data-sortable>Название вакансии</th>
+<!--?                <th data-sortable>Работодатель</th>-->
+                <th data-sortable>Опубликована</th>
+                <th data-sortable>Откликов</th>
+                <th data-sortable>Оформление</th>
+                <th data-sortable>Оклад</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- vacancies.js заполнит таблицу -->
+        </tbody>
+    </table>
+
+</div>
+
+<div class="container-page">
+    <p class="chart-source">
+        Таблица обновляется каждые 30 минут.
+    </p>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const now = new Date();
+    document.getElementById('current-date').textContent =
+        `${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')}`;
+    document.getElementById('current-datetime').textContent = now.toLocaleString();
+});
+</script>
+
+
+<script type="module" src="/app/static/js/vacancies.js"></script>
+
+{% endblock %}

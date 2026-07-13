@@ -30,6 +30,18 @@ async def index(request: Request):
     return templates.TemplateResponse("index.html", {"request": request})
 
 
+
+# --- Страница всех вакансий ---
+@router.get("/vacancies", response_class=HTMLResponse)
+async def vacancies(request: Request):
+    return templates.TemplateResponse(
+        "вакансии.html",
+        {
+            "request": request,
+        },
+    )
+
+
 # --- Обработчик GET-запроса для страницы языка по коду (lang.html) ---
 @router.get("/{lang}", response_class=HTMLResponse)
 async def show_lang_page(request: Request, lang: str):
