@@ -60,7 +60,7 @@ async def show_lang_page(request: Request, lang: str):
     async with db_pool.acquire() as conn:
         # ищем язык (name, code) по коду (lang)
         row = await conn.fetchrow(
-            "SELECT code, name FROM programming_languages WHERE code = $1",
+            "SELECT code, name, hh_keyword FROM programming_languages WHERE code = $1",
             lang.lower()    # на случай, если пользователь пришлёт /Python или /JAVA
         )
 
@@ -99,7 +99,8 @@ async def show_lang_page(request: Request, lang: str):
         "request": request,
         # объект HTTP-запроса, который пришёл от клиента (браузера или другого клиента)
         # Он содержит всю информацию о текущем запросе: URL, заголовки, параметры, куки, тело и т.д
-        "code"   : row["code"],  # для логотипов/таблиц/графиков
-        "name"   : row["name"],  # для правильного отображения языка на страницах
-        "skills" : skills        # навыки и их частота упоминаний (в пилюлях на странице языка)
+        "code"       : row["code"],        # для логотипов/таблиц/графиков
+        "name"       : row["name"],        # для правильного отображения языка на страницах
+        "skills"     : skills,             # навыки и их частота упоминаний (в пилюлях на странице языка)
+        "hh_keyword" : row["hh_keyword"],  # для заполнения таблицы вакансий вакансиями найденными по ключевому слову
     })

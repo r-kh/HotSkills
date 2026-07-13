@@ -46,7 +46,7 @@
 
 <!-- Блок вакансий -->
 
-{% if name == "Python" %}
+{% if hh_keyword %}
 
 <!-- Заголовок для таблицы с вакансиями по языкам программирования. Если удалить, не будет отображаться заголовок. -->
 <div class="chart-title">
@@ -101,6 +101,9 @@
         document.getElementById('current-date').textContent = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`;
         document.getElementById('current-datetime').textContent = now.toLocaleString();
     });
+</script>
+<script>
+    const hhKeyword = "{{ hh_keyword }}";
 </script>
 <script type="module" src="/app/static/js/vacancies.js"></script>
 {% endblock %}

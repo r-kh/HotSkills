@@ -11,9 +11,18 @@ let sortState = {
 
 document.addEventListener("DOMContentLoaded", async () => {
 
-    await loadVacanciesIfNeeded();
+    const search = typeof hhKeyword !== "undefined"
+        ? hhKeyword
+        : null;
 
-    tableData = [...getVacanciesData().vacancies];
+
+    await loadVacanciesIfNeeded(search);
+
+
+    tableData = [
+        ...getVacanciesData(search).vacancies
+    ];
+
 
     renderTable();
     addSorting();

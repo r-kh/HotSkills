@@ -1,6 +1,6 @@
 // === Кэш для данных по зарплатам и вакансиям (чтобы не создавать избыточных запросов (fetch), например при переключении регионов или дневных/почасовых показателей) === //
 let cachedSalariesData          = null;
-let cachedVacanciesData         = null;
+let cachedVacanciesData           = {};
 let cachedVacancyStatisticsData = null;
 let cachedResumeStatisticsData  = null;
 let cachedLanguagesData         = null;
@@ -38,17 +38,30 @@ export async function loadSalariesIfNeeded() {
 
 
 // === Загрузка вакансий ===
-export async function loadVacanciesIfNeeded() {
-    if (cachedVacanciesData) return;
+// === Загрузка вакансий ===
+export async function loadVacanciesIfNeeded(search = null) {
+
+    const cacheKey = search || "all";
+
+    if (cachedVacanciesData[cacheKey]) return;
+
     if (vacanciesLoadingPromise) return vacanciesLoadingPromise;
 
-    vacanciesLoadingPromise = fetch("/api/vacancies")
+    let url = "/api/vacancies";
+    if (search) {
+        url += `?search=${encodeURIComponent(search)}`;
+    }
+
+    vacanciesLoadingPromise = fetch(url)
         .then(res => res.json())
         .then(json => {
-            cachedVacanciesData = json;
-            vacanciesLoadingPromise = null; // сброс
+            cachedVacanciesData[cacheKey] = json;
+            vacanciesLoadingPromise = null;
+        })
+        .catch(err => {
+            vacanciesLoadingPromise = null;
+            throw err;
         });
-
     return vacanciesLoadingPromise;
 }
 
@@ -115,8 +128,8 @@ export function getSalariesData() {
 }
 
 // Возвращает кэшированные данные по вакансиям
-export function getVacanciesData() {
-    return cachedVacanciesData;
+export function getVacanciesData(search = null) {
+    return cachedVacanciesData[search || "all"];
 }
 
 // Возвращает кэшированные данные по статистике вакансий

@@ -22,7 +22,7 @@ async def load_languages(db_pool):
     """
     async with db_pool.acquire() as conn:
         rows = await conn.fetch(
-            "SELECT code, name, color FROM programming_languages ORDER BY id"
+            "SELECT code, name, color, hh_keyword FROM programming_languages ORDER BY id"
         )
         return [dict(row) for row in rows]
 

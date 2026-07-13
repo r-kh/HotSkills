@@ -6,6 +6,7 @@
 import logging
 
 # --- Сторонние библиотеки ---
+import re
 from fastapi import APIRouter, Request       # Маршрутизатор и запросы к FastAPI
 from fastapi.responses import JSONResponse   # Ответы в формате JSON (для API)
 from asyncpg.exceptions import PostgresError
@@ -55,15 +56,15 @@ async def get_vacancies(request: Request, search: str | None = None):
                 rows = await conn.fetch("""SELECT id, name, employer, date, responses, labor_contract, salary, description FROM vacancies;""")
 
                 result = {"vacancies": [{
-                            "id"             : row["id"],
-                            "name"           : row["name"],
-                            "Работодатель"   : row["employer"],
-                            "date"           : row["date"].isoformat(),
-                            "responses"      : row["responses"],
-                            "labor_contract" : row["labor_contract"],
-                            "salary"         : row["salary"],
-                            "description"    : row["description"]}
-                        for row in rows ]}
+                    "id"             : row["id"],
+                    "name"           : row["name"],
+                    "Работодатель"   : row["employer"],
+                    "date"           : row["date"].isoformat(),
+                    "responses"      : row["responses"],
+                    "labor_contract" : row["labor_contract"],
+                    "salary"         : row["salary"],
+                    "description"    : row["description"]}
+                    for row in rows ]}
 
             # кэшируем на 30 минут
             await set_cache(redis_pool, cache_key, result, expire=CACHE_TTL_30_MIN)
@@ -72,12 +73,23 @@ async def get_vacancies(request: Request, search: str | None = None):
             logging.error("Ошибка при запросе к базе данных (vacancies): %s", e)
             return JSONResponse(status_code=500, content={"error": str(e)})
 
-
     # -------- Поиск --------
     if search:
-        query = search.lower()
-        result["vacancies"] = [vacancy for vacancy in result["vacancies"]
-            if (query in (vacancy["name"] or "").lower() or query in (vacancy["description"] or "").lower())]
+        # Поддержка запросов вида "Go OR Golang"
+        queries = [q.strip().lower() for q in search.split("OR")]
+
+        def match_text(text: str, query: str) -> bool:
+            return re.search(rf"\b{re.escape(query)}\b", text.lower()) is not None
+
+        result["vacancies"] = [
+            vacancy
+            for vacancy in result["vacancies"]
+            if any(
+                match_text(vacancy["name"] or "", query)
+                or match_text(vacancy["description"] or "", query)
+                for query in queries
+            )
+        ]
 
 
     # -------- Убираем description перед отдачей --------
