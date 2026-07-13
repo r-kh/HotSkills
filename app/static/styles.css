@@ -125,6 +125,80 @@ body {
 
 
 
+/* ===== СТРОКА ПОИСКА ===== */
+
+.search-container {
+    max-width: 1400px;
+    margin: 20px auto 10px;
+    padding: 0 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+.search-box {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    max-width: 500px;
+}
+#search-input {
+    flex: 1;
+    padding: 10px 14px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    font-family: 'Exo 2', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+}
+#search-input:focus {
+    border-color: #b30000;
+}
+#search-button {
+    padding: 10px 24px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: 'Exo 2', sans-serif;
+    background: #b30000;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+#search-button:hover {
+    background: #8a0000;
+}
+.search-results-info {
+    font-size: 14px;
+    color: #333;
+    margin-top: 4px;
+}
+#vacancy-count {
+    font-weight: 600;
+    color: #b30000;
+}
+@media (max-width: 720px) {
+    .search-box {
+        max-width: 100%;
+    }
+    #search-input {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+    #search-button {
+        font-size: 14px;
+        padding: 8px 16px;
+    }
+    .search-results-info {
+        font-size: 12px;
+    }
+}
+
+
+
 
 /* ===== ГРАФИК ===== */
 /* Заголовок графика */

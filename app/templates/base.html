@@ -70,6 +70,39 @@
                 </div>
             </div>
         </a>
+
+        <!-- Блок навигации – будет отображаться везде, кроме страницы /vacancies -->
+        {% block header_nav %}
+        <div style="
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            margin-left: auto;
+            flex-wrap: wrap;
+        ">
+            <span style="
+                font-weight: 600;
+                font-size: 18px;
+                color: #333;
+                white-space: nowrap;
+            ">
+
+            </span>
+
+            <a href="/vacancies" style="
+                background: #b30000;
+                color: white;
+                padding: 10px 22px;
+                border-radius: 5px;
+                text-decoration: none;
+                font-weight: 600;
+                white-space: nowrap;
+            ">
+                Переключиться на таблицу открытых вакансий разработчиков для анализа →
+            </a>
+        </div>
+        {% endblock %}
+
     </div>
 </header>
 

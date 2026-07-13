@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 
+{# Скрываем навигационную ссылку на этой странице #}
+{% block header_nav %}{% endblock %}
+
 {% block title %}Вакансии программистов / DevSkills.info{% endblock %}
 
 {% block content %}
@@ -15,6 +18,18 @@
             id="current-datetime"></span>)</span>
 </div>
 
+<!-- БЛОК ПОИСКА (добавлен) -->
+<div class="search-container">
+    <div class="search-box">
+        <input type="text" id="search-input" placeholder="Введите ключевые слова, например: Python" />
+        <button id="search-button">Найти</button>
+    </div>
+    <div class="search-results-info">
+        Найдено вакансий: <span id="vacancy-count">0</span>
+    </div>
+</div>
+
+
 <div class="salary-table-wrapper">
 
     <div class="tabs">
@@ -26,7 +41,7 @@
         <thead>
             <tr>
                 <th data-sortable>Название вакансии</th>
-<!--?                <th data-sortable>Работодатель</th>-->
+                <th data-sortable>Работодатель</th>
                 <th data-sortable>Опубликована</th>
                 <th data-sortable>Откликов</th>
                 <th data-sortable>Оформление</th>
