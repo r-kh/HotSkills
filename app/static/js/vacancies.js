@@ -90,8 +90,9 @@ function renderTable() {
         `;
         tbody.appendChild(tr);
     });
-    vacancyCountSpan.textContent = tableData.length;
-}
+    if (vacancyCountSpan) {
+        vacancyCountSpan.textContent = tableData.length;
+}}
 
 function updateSortIcons(activeColumn) {
     const headers = document.querySelectorAll('.salary-table th');
@@ -147,16 +148,36 @@ async function handleSearch() {
     await updateTable(searchParam);
 }
 
+function getInitialSearch() {
+    if (typeof hhKeyword !== "undefined" && hhKeyword) {
+        return hhKeyword;
+    }
+
+    return getSearchFromURL();
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
-    const urlSearch = getSearchFromURL();
-    if (urlSearch) searchInput.value = urlSearch;
+    const urlSearch = getInitialSearch();
+
+    if (searchInput && urlSearch) {
+        searchInput.value = urlSearch;
+    }
+
     await updateTable(urlSearch);
+
+    // сортировка всегда нужна
     addSorting();
-    searchButton.addEventListener('click', handleSearch);
-    searchInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            handleSearch();
-        }
-    });
+
+    // поиск только на странице /vacancies
+    if (searchButton && searchInput) {
+
+        searchButton.addEventListener('click', handleSearch);
+
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSearch();
+            }
+        });
+    }
 });
