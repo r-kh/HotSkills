@@ -141,11 +141,90 @@ function updateURL(search) {
     window.history.pushState({}, '', url);
 }
 
+// Флаг, чтобы предотвратить повторные запросы во время загрузки
+let isSearching = false;
+
+// Функция для установки состояния загрузки
+function setLoadingState(isLoading) {
+    if (!searchButton || !searchInput) return;
+
+    const tableWrapper = document.querySelector('.salary-table-wrapper');
+
+    if (isLoading) {
+        // Блокируем кнопку и меняем текст
+        searchButton.disabled = true;
+        searchButton.textContent = 'Ищем…';
+        // Добавляем спиннер
+        const spinner = document.createElement('span');
+        spinner.className = 'spinner';
+        spinner.id = 'search-spinner';
+        searchButton.appendChild(spinner);
+
+        // Меняем счётчик
+        if (vacancyCountSpan) {
+            vacancyCountSpan.textContent = '…';
+            vacancyCountSpan.classList.add('loading');
+        }
+
+        // Затемняем таблицу
+        if (tableWrapper) {
+            tableWrapper.classList.add('loading');
+        }
+    } else {
+        // Восстанавливаем кнопку
+        searchButton.disabled = false;
+        searchButton.textContent = 'Найти';
+        const existingSpinner = document.getElementById('search-spinner');
+        if (existingSpinner) existingSpinner.remove();
+
+        // Восстанавливаем счётчик (он обновится в renderTable, но на всякий случай)
+        if (vacancyCountSpan) {
+            vacancyCountSpan.classList.remove('loading');
+            vacancyCountSpan.textContent = tableData.length; // актуальное значение
+        }
+
+        // Убираем затемнение
+        if (tableWrapper) {
+            tableWrapper.classList.remove('loading');
+        }
+    }
+}
+
+
+// Обновлённая функция handleSearch
 async function handleSearch() {
+    // Если уже идёт поиск – игнорируем
+    if (isSearching) return;
+
     const query = searchInput.value.trim();
     const searchParam = query || null;
+
+    // Обновляем URL
     updateURL(searchParam);
-    await updateTable(searchParam);
+
+    // Включаем индикатор загрузки
+    setLoadingState(true);
+    isSearching = true;
+
+    try {
+        // Выполняем запрос и обновляем таблицу
+        await updateTable(searchParam);
+    } catch (error) {
+        console.error('Ошибка при поиске:', error);
+        // Можно показать сообщение об ошибке (опционально)
+        if (vacancyCountSpan) {
+            vacancyCountSpan.textContent = 'Ошибка';
+            vacancyCountSpan.classList.remove('loading');
+        }
+    } finally {
+        // В любом случае выключаем индикатор
+        setLoadingState(false);
+        isSearching = false;
+        // Обновляем счётчик после загрузки (он уже обновлён в renderTable, но на всякий случай)
+        if (vacancyCountSpan && !vacancyCountSpan.classList.contains('loading')) {
+            vacancyCountSpan.textContent = tableData.length;
+        }
+    }
 }
 
 function getInitialSearch() {

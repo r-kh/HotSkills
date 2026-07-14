@@ -197,7 +197,35 @@ body {
     }
 }
 
+/* Спиннер (вращающийся круг) */
+.spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-left: 8px;
+    vertical-align: middle;
+}
 
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Кнопка в состоянии загрузки */
+#search-button:disabled {
+    background: #999;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+/* Дополнительно: счётчик вакансий в режиме загрузки */
+.search-results-info .loading {
+    color: #999;
+    font-style: italic;
+}
 
 
 /* ===== ГРАФИК ===== */
@@ -297,6 +325,17 @@ body {
 
 
 /* ===========ТАБЛИЦА ЗАРПЛАТ=========== */
+
+/* PЗатемнение таблицы при поиске */
+.salary-table-wrapper.loading::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255,255,255,0.5);
+    pointer-events: none;
+    z-index: 10;
+}
+
 
 /* Обёртка таблицы зарплат */
 .salary-table-wrapper {
