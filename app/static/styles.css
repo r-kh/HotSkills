@@ -413,7 +413,7 @@ body {
 }
 
 /* Первая колонка: иконка + текст */
-.salary-table td:first-child {
+.salary-table.with-icons td:first-child {
   display       : flex;            /* Горизонтальное размещение содержимого */
   align-items   : center;          /* Центрирование по вертикали */
   gap           : 8px;             /* Расстояние между иконкой и текстом */
