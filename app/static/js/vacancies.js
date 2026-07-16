@@ -32,7 +32,14 @@ function sortData() {
             case 2: {
                 const dateA = Date.parse(a.date);
                 const dateB = Date.parse(b.date);
-                return asc ? dateA - dateB : dateB - dateA;
+
+                if (dateA !== dateB) {
+                    return asc ? dateA - dateB : dateB - dateA;
+                }
+
+                return asc
+                    ? a.responses - b.responses
+                    : a.responses - b.responses;
             }
             case 3: {
                 return asc ? a.responses - b.responses : b.responses - a.responses;
