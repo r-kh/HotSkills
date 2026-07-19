@@ -251,6 +251,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     await updateTable(urlSearch);
 
+    // ----- начальная сортировка по дате -----
+    if (sortState.column === null) {      // если сортировка ещё не установлена
+        sortState.column = 2;             // колонка "Дата"
+        sortState.ascending = false;      // false = по убыванию (свежие сверху)
+        sortData();                       // применяем сортировку к tableData
+        renderTable();                    // перерисовываем таблицу
+        // updateSortIcons(2);            // обновляем иконку сортировки на заголовке (если нужно будет)
+    }
+
     // сортировка всегда нужна
     addSorting();
 
