@@ -278,7 +278,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // ----- начальная сортировка по дате -----
     if (sortState.column === null) {      // если сортировка ещё не установлена
-        sortState.column = 2;             // колонка "Дата"
+        sortState.column = 3;             // колонка "Опубликована"
         sortState.ascending = false;      // false = по убыванию (свежие сверху)
         sortData();                       // применяем сортировку к tableData
         renderTable();                    // перерисовываем таблицу
