@@ -30,8 +30,8 @@ function sortData() {
                 return asc ? compA.localeCompare(compB, 'ru') : compB.localeCompare(compA, 'ru');
             }
             case 2: {
-                const dateA = Date.parse(a.date);
-                const dateB = Date.parse(b.date);
+                const dateA = Date.parse(a.Создана);
+                const dateB = Date.parse(b.Создана);
 
                 if (dateA !== dateB) {
                     return asc ? dateA - dateB : dateB - dateA;
@@ -90,7 +90,7 @@ function renderTable() {
         tr.innerHTML = `
             <td>${vacancy.name}</td>
             <td>${vacancy.Работодатель}</td>
-            <td>${vacancy.date}</td>
+            <td>${vacancy.Создана}</td>
             <td>${vacancy.responses}</td>
             <td>${formatLaborContract(vacancy.labor_contract)}</td>
             <td>${formatSalary(vacancy.salary)}</td>
