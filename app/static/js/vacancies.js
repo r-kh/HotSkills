@@ -41,15 +41,36 @@ function sortData() {
                     ? a.Откликов_с_момента_создания - b.Откликов_с_момента_создания
                     : a.Откликов_с_момента_создания - b.Откликов_с_момента_создания;
             }
-            case 3: {
-                return asc ? a.Откликов_с_момента_создания - b.Откликов_с_момента_создания : b.Откликов_с_момента_создания - a.Откликов_с_момента_создания;
+
+            case 3: { // Опубликована
+                const dateA = Date.parse(a.Опубликована);
+                const dateB = Date.parse(b.Опубликована);
+                if (dateA !== dateB) {
+                    // Основная сортировка по дате
+                    return asc ? dateA - dateB : dateB - dateA;
+                }
+                // Даты равны – сортируем по откликам с момента публикации по возрастанию
+                return a.Откликов_с_момента_публикации - b.Откликов_с_момента_публикации;
             }
-            case 4: {
+
+            case 4: { // Откликов с момента публикации
+                return asc
+                    ? a.Откликов_с_момента_публикации - b.Откликов_с_момента_публикации
+                    : b.Откликов_с_момента_публикации - a.Откликов_с_момента_публикации;
+            }
+
+            case 5: { // Откликов с момента создания
+                return asc
+                    ? a.Откликов_с_момента_создания - b.Откликов_с_момента_создания
+                    : b.Откликов_с_момента_создания - a.Откликов_с_момента_создания;
+            }
+
+            case 6: { // Трудовой договор
                 const contractA = a.labor_contract ? 1 : 0;
                 const contractB = b.labor_contract ? 1 : 0;
                 return asc ? contractA - contractB : contractB - contractA;
             }
-            case 5: {
+            case 7: { // Оклад
                 const salaryAFrom = a.salary?.[0] ?? 0;
                 const salaryATo   = a.salary?.[1] ?? salaryAFrom;
                 const salaryBFrom = b.salary?.[0] ?? 0;
@@ -91,6 +112,8 @@ function renderTable() {
             <td>${vacancy.name}</td>
             <td>${vacancy.Работодатель}</td>
             <td>${vacancy.Создана}</td>
+            <td>${vacancy.Опубликована}</td>
+            <td>${vacancy.Откликов_с_момента_публикации}</td>
             <td>${vacancy.Откликов_с_момента_создания}</td>
             <td>${formatLaborContract(vacancy.labor_contract)}</td>
             <td>${formatSalary(vacancy.salary)}</td>
@@ -119,7 +142,9 @@ function addSorting() {
         () => { sortState.ascending = sortState.column === 2 ? !sortState.ascending : false; sortState.column = 2; sortData(); updateSortIcons(2); renderTable(); },
         () => { sortState.ascending = sortState.column === 3 ? !sortState.ascending : false; sortState.column = 3; sortData(); updateSortIcons(3); renderTable(); },
         () => { sortState.ascending = sortState.column === 4 ? !sortState.ascending : false; sortState.column = 4; sortData(); updateSortIcons(4); renderTable(); },
-        () => { sortState.ascending = sortState.column === 5 ? !sortState.ascending : false; sortState.column = 5; sortData(); updateSortIcons(5); renderTable(); }
+        () => { sortState.ascending = sortState.column === 5 ? !sortState.ascending : false; sortState.column = 5; sortData(); updateSortIcons(5); renderTable(); },
+        () => { sortState.ascending = sortState.column === 6 ? !sortState.ascending : false; sortState.column = 6; sortData(); updateSortIcons(6); renderTable(); },
+        () => { sortState.ascending = sortState.column === 7 ? !sortState.ascending : false; sortState.column = 7; sortData(); updateSortIcons(7); renderTable(); }
     ];
     headers.forEach((th, index) => {
         th.style.cursor = 'pointer';

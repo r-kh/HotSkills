@@ -464,6 +464,12 @@ body {
   cursor        : pointer;                    /* Курсор-ссылка при наведении */
 }
 
+/* Значения в колонке "Создана" не переносятся на новую строку */
+.salary-table tbody td:nth-child(3),
+.salary-table thead th:nth-child(3) {
+    white-space: nowrap;
+}
+
 /* Чередование цвета строк (зебра) */
 .salary-table tbody tr:nth-child(even) {
   background-color: #f9f9f9; /* Светлый фон для чётных строк */
