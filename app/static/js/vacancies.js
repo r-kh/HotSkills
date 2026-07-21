@@ -38,11 +38,11 @@ function sortData() {
                 }
 
                 return asc
-                    ? a.responses - b.responses
-                    : a.responses - b.responses;
+                    ? a.Откликов_с_момента_создания - b.Откликов_с_момента_создания
+                    : a.Откликов_с_момента_создания - b.Откликов_с_момента_создания;
             }
             case 3: {
-                return asc ? a.responses - b.responses : b.responses - a.responses;
+                return asc ? a.Откликов_с_момента_создания - b.Откликов_с_момента_создания : b.Откликов_с_момента_создания - a.Откликов_с_момента_создания;
             }
             case 4: {
                 const contractA = a.labor_contract ? 1 : 0;
@@ -91,7 +91,7 @@ function renderTable() {
             <td>${vacancy.name}</td>
             <td>${vacancy.Работодатель}</td>
             <td>${vacancy.Создана}</td>
-            <td>${vacancy.responses}</td>
+            <td>${vacancy.Откликов_с_момента_создания}</td>
             <td>${formatLaborContract(vacancy.labor_contract)}</td>
             <td>${formatSalary(vacancy.salary)}</td>
         `;

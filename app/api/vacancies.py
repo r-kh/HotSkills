@@ -28,10 +28,10 @@ async def get_vacancies(request: Request, search: str | None = None):
     Пример ответа на фронт:
     {
         "vacancies": [
-            {"id": 135021315, "name": "Python",    "Создана": "2026-07-08", "responses": 351, "salary": [1000, null] },
-            {"id": 135021315, "name": "FastAPI",   "Создана": "2026-07-08", "responses": 351, "salary": [1000, 2000] },
-            {"id": 135021316, "name": "Backend",   "Создана": "2026-07-07", "responses": 120, "salary": [null, 3000] },
-            {"id": 135021317, "name": "Developer", "Создана": "2026-07-06", "responses": 500, "salary":         null },
+            {"id": 135021315, "name": "Python",    "Создана": "2026-07-08", "Откликов_с_момента_создания": 351, "salary": [1000, null] },
+            {"id": 135021315, "name": "FastAPI",   "Создана": "2026-07-08", "Откликов_с_момента_создания": 351, "salary": [1000, 2000] },
+            {"id": 135021316, "name": "Backend",   "Создана": "2026-07-07", "Откликов_с_момента_создания": 120, "salary": [null, 3000] },
+            {"id": 135021317, "name": "Developer", "Создана": "2026-07-06", "Откликов_с_момента_создания": 500, "salary":         null },
             ...]
     }
     """
@@ -69,7 +69,7 @@ async def get_vacancies(request: Request, search: str | None = None):
             async with postgresql.acquire() as conn:
 
                 # получаем данные
-                rows = await conn.fetch("""SELECT id, name, employer, Создана, responses, labor_contract, salary, description FROM vacancies;""")
+                rows = await conn.fetch("""SELECT id, name, employer, Создана, Откликов_с_момента_создания, labor_contract, salary, description FROM vacancies;""")
 
                 # нам понадобится делать 2 кэша, 1 со всеми параметрами для поиска, 2 без description для быстрой передачи пользователю
                 вакансии_с_description = {"vacancies": []}
@@ -78,13 +78,13 @@ async def get_vacancies(request: Request, search: str | None = None):
                 for row in rows:
 
                     вакансия = {
-                        "id"             : row["id"],
-                        "name"           : row["name"],
-                        "Работодатель"   : row["employer"],
-                        "Создана"        : row["Создана"].isoformat(),
-                        "responses"      : row["responses"],
-                        "labor_contract" : row["labor_contract"],
-                        "salary"         : row["salary"]}
+                        "id"                          : row["id"],
+                        "name"                        : row["name"],
+                        "Работодатель"                : row["employer"],
+                        "Создана"                     : row["Создана"].isoformat(),
+                        "Откликов_с_момента_создания" : row["Откликов_с_момента_создания"],
+                        "labor_contract"              : row["labor_contract"],
+                        "salary"                      : row["salary"]}
 
                     вакансии_без_description["vacancies"].append(вакансия)
                     вакансии_с_description["vacancies"].append(вакансия | {"description": row["description"]})
