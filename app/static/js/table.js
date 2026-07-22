@@ -1,5 +1,4 @@
-import { loadVacancyStatisticsIfNeeded, loadSalariesIfNeeded, getLanguagesData, getVacancyStatisticsData, getSalariesData } from './api.js';
-
+import { loadVacancyStatisticsIfNeeded, loadSalariesIfNeeded, loadLanguagesIfNeeded, getLanguagesData, getVacancyStatisticsData, getSalariesData} from './api.js';
 
 let currentRegion = 'moscow';  // Текущий выбранный регион (по умолчанию Москва)
 let tabs;                            // Элементы в HTML с классом .tab (вкладки) (*вынесена в переменную чтобы не дублировать поиск по HTML в разных функциях)
@@ -49,7 +48,7 @@ async function activateTab(tab) {
 async function updateSalaryTable(region) {
     try {
         // загружаем данные при необходимости
-        await Promise.all([loadVacancyStatisticsIfNeeded(), loadSalariesIfNeeded()]);
+        await Promise.all([loadLanguagesIfNeeded(), loadVacancyStatisticsIfNeeded(), loadSalariesIfNeeded()]);
         clearTableBody();       // Очищаем таблицу
         addRowsToTable(region); // Заполняем таблицу строками по региону
         addTableSorting();      // Подключаем сортировку

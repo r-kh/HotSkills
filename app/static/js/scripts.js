@@ -19,13 +19,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // --- Локализованная текущая дата --- //
     // Получаем ссылку на HTML-элемент с id "current-date" и отображаем текущую дату в локализованном формате
-    document.getElementById('current-date').textContent = date;
+    // document.getElementById('current-date').textContent = date;
+    const currentDate = document.getElementById('current-date');
+
+    if (currentDate) {
+        currentDate.textContent = date;
+    }
 
 
     // --- Локализованные текущие дата и время --- //
     // Получаем ссылку на HTML-элемент с id "current-datetime" и отображаем текущие дату и время в этом HTML-элементе в локализованном формате
-    document.getElementById('current-datetime').textContent = `${date}, ${time} ${tz}`;
+    // document.getElementById('current-datetime').textContent = `${date}, ${time} ${tz}`;
+    const currentDatetime = document.getElementById('current-datetime');
 
+    if (currentDatetime) {
+        currentDatetime.textContent = `${date}, ${time} ${tz}`;
+    }
 
     // Запуск графиков
     initCharts();

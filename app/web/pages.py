@@ -42,6 +42,19 @@ async def vacancies(request: Request):
     )
 
 
+
+# --- Страница зарплат ---
+@router.get("/salaries", response_class=HTMLResponse)
+async def salaries(request: Request):
+    return templates.TemplateResponse(
+        "зарплаты.html",
+        {
+            "request": request,
+        },
+    )
+
+
+
 # --- Обработчик GET-запроса для страницы языка по коду (lang.html) ---
 @router.get("/{lang}", response_class=HTMLResponse)
 async def show_lang_page(request: Request, lang: str):
