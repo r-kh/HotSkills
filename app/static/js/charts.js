@@ -4,7 +4,9 @@ import {
     getLanguagesData,
     loadLanguagesIfNeeded,
     loadResumeStatisticsIfNeeded,
-    getResumesStatisticsData
+    getResumesStatisticsData,
+    loadNewVacanciesStatisticsIfNeeded,
+    getNewVacanciesStatisticsData
 } from './api.js';
 
 
@@ -279,6 +281,7 @@ export const initCharts = async () => {
         await loadLanguagesIfNeeded();
         await loadResumeStatisticsIfNeeded();
         await loadVacancyStatisticsIfNeeded();
+        await loadNewVacanciesStatisticsIfNeeded();
 
         renderChart({
             htmlContainerId         : 'chart_software_developer_resumes',
@@ -297,6 +300,20 @@ export const initCharts = async () => {
             switchable              : true,
             defaultView             : 'daily',
             showLegend              : false,
+        });
+
+                // Новый график: количество новых вакансий
+        renderChart({
+            htmlContainerId: 'chart_new_vacancies',
+            vacancyStats: getNewVacanciesStatisticsData(),
+            chartEntities: [
+                { code: 'moscow', name: 'Москва', color: '#ff7f0e' },
+                { code: 'russia', name: 'Россия', color: '#1f77b4' }
+            ],
+            switchable: false,         // только daily, переключение не нужно
+            defaultView: 'daily',
+            showLegend: true,
+            yAxisTitle: 'Количество новых вакансий'
         });
 
         renderChart({

@@ -50,7 +50,7 @@ body {
 /* ===== ШАПКА САЙТА ===== */
 .site-header {  /* в CSS точка (.) перед названием означает, что ты обращаешься к классу */
     background      : #f2f2f2;                      /* Цвет фона шапки */
-    padding         : 16px 0;                       /* внутренний отступ для элементв сверху и снизу (16 пикселей), слева и справа — 0 */
+    /*padding         : 16px 0;                       !* внутренний отступ для элементв сверху и снизу (16 пикселей), слева и справа — 0 *!*/
     border-bottom   : 1px solid #ccc;               /* Тонкая нижняя граница */
     box-shadow      : 0 2px 4px rgba(0, 0, 0, 0.1); /* Легкая тень под шапкой над контентом */
     position        : sticky;                       /* Шапка прилипает при прокрутке (relative - чтобы не прилипала) */
@@ -107,6 +107,85 @@ body {
 }
 
 
+/* ================= HEADER NAVIGATION ================= */
+
+.header-tabs{
+    margin-left:auto;
+
+    display:flex;
+    align-items:stretch;
+
+    height:72px;
+}
+
+.header-tabs a{
+
+    display:flex;
+    align-items:center;
+
+    padding:0 26px;
+
+    text-decoration:none;
+
+    color:#555;
+
+    font-weight:600;
+
+    transition:.2s;
+
+    border-bottom:4px solid transparent;
+}
+
+.header-tabs a:hover{
+
+    color:#111;
+    background:#ececec;
+}
+
+.header-tabs a.active{
+
+    color:#111;
+
+    background:white;
+
+    border-bottom:4px solid #b30000;
+}
+
+
+/*.header-tabs a{*/
+
+/*    display:flex;*/
+/*    align-items:center;*/
+
+/*    padding:0 24px;*/
+
+/*    margin:10px 0;*/
+
+/*    border-radius:6px;*/
+
+/*    color:#555;*/
+
+/*    text-decoration:none;*/
+
+/*    transition:.2s;*/
+/*}*/
+
+/*.header-tabs a:hover{*/
+
+/*    background:#ececec;*/
+/*}*/
+
+/*.header-tabs a.active{*/
+
+/*    background:#fff;*/
+
+/*    color:#111;*/
+
+/*    box-shadow:*/
+/*        0 1px 3px rgba(0,0,0,.08);*/
+
+/*    border:1px solid #ddd;*/
+/*}*/
 
 
 /* ===== НАЗВАНИЕ ЯЗЫКА В ДОЧЕРНИХ СТРАНИЦАХ (lang.html) ===== */
